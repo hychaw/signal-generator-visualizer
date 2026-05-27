@@ -1,14 +1,6 @@
 # Signal Generator Visualizer
 
-![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)
-![MIT License](https://img.shields.io/badge/License-MIT-green)
-
-Signal Generator Visualizer is an interactive React + TypeScript web app for exploring common engineering waveforms. It provides a blue oscilloscope-style display where users can adjust signal parameters, view measurement readouts, apply presets, reset parameters, and export generated waveform samples as CSV data.
-
-The project is intended as an educational engineering visualization tool and a public portfolio project demonstrating frontend development, TypeScript data modeling, signal-generation math, browser-based data export, and deployment with Vercel.
+Signal Generator Visualizer is an interactive React + TypeScript web app for visualizing common engineering waveforms in a blue oscilloscope-style interface. Users can adjust signal parameters, view measurement readouts, apply presets, reset parameters, and export generated waveform samples as CSV data.
 
 ## Live Demo
 
@@ -22,9 +14,7 @@ https://signal-generator-visualizer.vercel.app/
 
 ## Overview
 
-The app helps users explore how common waveform parameters affect signal shape over time. Users can select a waveform type, adjust controls such as frequency and amplitude, and immediately see the plotted waveform update in the oscilloscope-style chart.
-
-The interface is designed as a responsive dashboard so it can be used for quick experimentation, classroom-style explanations, or as a reference project for building data-driven React interfaces.
+The app helps users explore how waveform parameters affect signal shape over time. It is useful for engineering learning, quick experimentation, and demonstrating frontend portfolio skills through a responsive, data-driven React interface.
 
 ## Features
 
@@ -69,11 +59,11 @@ public/
   Signal Generator Visualizer UI.png
 ```
 
-- `src/components/` contains the reusable UI sections for signal controls, presets, explanations, and the waveform display.
-- `src/lib/` contains signal types, waveform generation utilities, preset data, and CSV export helpers.
-- `src/App.tsx` connects app state, generated waveform data, controls, and layout.
+- `src/components/` contains the main UI sections.
+- `src/lib/` contains signal math, types, presets, and CSV export helpers.
+- `src/App.tsx` connects app state and layout.
 - `src/main.tsx` mounts the React app.
-- `public/` stores static assets such as the README screenshot.
+- `public/` stores the screenshot and other static assets.
 
 ## Getting Started
 
@@ -109,11 +99,12 @@ npm run build
 The project was developed with a planned, milestone-based workflow:
 
 - Planned the project features, UI sections, and file structure before implementation
-- Built the app step by step using an AI-assisted coding workflow with Codex
-- Reviewed and tested each feature locally with `npm run dev`
-- Checked production readiness with `npm run build`
-- Committed changes with Git and pushed to GitHub after project milestones
-- Deployed the final app to Vercel from the GitHub repository
+- Built the app step by step using an AI-assisted development workflow with Codex
+- Manually reviewed each feature during implementation
+- Tested locally with `npm run dev`
+- Checked production builds with `npm run build`
+- Used Git commits and GitHub pushes after milestones
+- Deployed through Vercel
 
 This workflow combined AI-assisted implementation support with manual review, local testing, and Git-based version control.
 
@@ -125,11 +116,23 @@ https://signal-generator-visualizer.vercel.app/
 
 Vercel is connected to the GitHub repository, so future pushes to the main branch can trigger a new production deployment.
 
+## Key Skills Demonstrated
+
+- React component-based UI development
+- TypeScript interfaces and reusable data models
+- Signal generation logic for engineering waveforms
+- Data visualization with Recharts
+- Browser-based CSV export
+- Responsive dashboard UI design
+- Git/GitHub version control
+- Vercel deployment workflow
+- AI-assisted development with manual testing and review
+
 ## What I Learned
 
-This project helped me practice building a structured React application with reusable components and clear state flow. I also worked with TypeScript interfaces and reusable types to keep signal parameters, presets, and generated waveform data organized.
+This project helped me practice React component structure, UI state management, and TypeScript reusable types for organizing signal parameters, presets, and generated waveform data.
 
-From the engineering side, I learned more about signal generation math, UI state management, data visualization with Recharts, and exporting CSV files directly in the browser. I also gained experience with a Git/GitHub workflow, deployment with Vercel, and using an AI-assisted development workflow while still manually reviewing and testing the app.
+I also learned more about signal generation math, data visualization with Recharts, CSV export in the browser, Git/GitHub workflow, and deployment with Vercel. The project also gave me practice using an AI-assisted workflow responsibly while testing and reviewing the result manually.
 
 ## Future Improvements
 
