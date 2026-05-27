@@ -10,7 +10,8 @@ Screenshot coming soon.
 
 - Select sine, square, triangle, sawtooth, and pulse signals
 - Adjust frequency, amplitude, phase, DC offset, and duty cycle where applicable
-- Real-time waveform chart
+- Oscilloscope-style waveform display
+- Measurement readouts near the chart
 - Educational explanation panel
 - Engineering signal presets
 - Export waveform samples to CSV
@@ -55,7 +56,7 @@ npm run build
 
 ```text
 src/
-  components/   Reusable React UI components for controls, presets, explanations, and the waveform chart
+  components/   Reusable React UI components for controls, presets, explanations, and the waveform display
   lib/          Signal types, generation math, preset data, and CSV export helpers
   App.tsx       Main application component that connects state, controls, generated data, and UI sections
 ```
@@ -70,10 +71,10 @@ On the engineering side, I learned more about signal generation math for common 
 
 - FFT spectrum view
 - Audio playback
-- Oscilloscope-style grid
 - Filters
 - Bode/frequency response tools
 - Unit tests for signal generation
+- Deploying the app online with GitHub Pages, Netlify, or Vercel
 
 ## License
 
