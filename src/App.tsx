@@ -35,6 +35,10 @@ function App() {
     );
   };
 
+  const resetParameters = () => {
+    setParameters(sanitizeSignalParameters(DEFAULT_SIGNAL_PARAMETERS));
+  };
+
   const exportSignalCsv = () => {
     downloadCsvFile(
       signalDataToCsv(signalData),
@@ -48,7 +52,8 @@ function App() {
         <p className="eyebrow">Engineering signal exploration</p>
         <h1>Signal Generator Visualizer</h1>
         <p className="description">
-          Explore common engineering waveforms by adjusting signal parameters.
+          Explore, adjust, and export common engineering waveforms in an
+          oscilloscope-style interface.
         </p>
       </header>
 
@@ -57,6 +62,7 @@ function App() {
           <SignalControls
             parameters={parameters}
             onParametersChange={updateParameters}
+            onResetParameters={resetParameters}
           />
           <SignalPresets onPresetSelect={updateParameters} />
           <SignalExplanation signalType={parameters.type} />

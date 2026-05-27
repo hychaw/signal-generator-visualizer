@@ -4,11 +4,12 @@
     sans-serif;
   color: #172033;
   background:
-    linear-gradient(rgba(36, 48, 68, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(36, 48, 68, 0.035) 1px, transparent 1px),
-    radial-gradient(circle at top left, rgba(20, 184, 166, 0.12), transparent 34rem),
-    #f5f7fb;
-  background-size: 28px 28px, 28px 28px, auto, auto;
+    linear-gradient(rgba(14, 116, 144, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 116, 144, 0.055) 1px, transparent 1px),
+    radial-gradient(circle at top left, rgba(34, 211, 238, 0.16), transparent 34rem),
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.12), transparent 30rem),
+    #eef4f9;
+  background-size: 28px 28px, 28px 28px, auto, auto, auto;
   font-synthesis: none;
   line-height: 1.5;
   text-rendering: optimizeLegibility;

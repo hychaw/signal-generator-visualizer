@@ -14,6 +14,7 @@ import {
 interface SignalControlsProps {
   parameters: SignalParameters;
   onParametersChange: (updates: Partial<SignalParameters>) => void;
+  onResetParameters: () => void;
 }
 
 type NumericControlKey = keyof Pick<
@@ -78,6 +79,7 @@ function formatParameterValue(value: number): string {
 function SignalControls({
   parameters,
   onParametersChange,
+  onResetParameters,
 }: SignalControlsProps) {
   const shouldShowDutyCycle = DUTY_CYCLE_SIGNAL_TYPES.includes(parameters.type);
   const [activeInput, setActiveInput] = useState<NumericControlKey | null>(null);
@@ -127,9 +129,24 @@ function SignalControls({
     onParametersChange({ type: value });
   };
 
+  const resetParameters = () => {
+    setActiveInput(null);
+    setDraftValue("");
+    onResetParameters();
+  };
+
   return (
     <section className="panel controls-panel" aria-labelledby="controls-title">
-      <h2 id="controls-title">Signal Controls</h2>
+      <div className="panel-heading">
+        <h2 id="controls-title">Signal Controls</h2>
+        <button
+          className="secondary-button"
+          type="button"
+          onClick={resetParameters}
+        >
+          Reset Parameters
+        </button>
+      </div>
 
       <label className="field">
         <span>Signal type</span>

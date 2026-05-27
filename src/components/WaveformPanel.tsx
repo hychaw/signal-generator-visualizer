@@ -39,12 +39,13 @@ const formatChartValue = (value: unknown) => {
 };
 
 const chartTheme = {
-  axis: "#c8facc",
-  grid: "#2f6f55",
-  line: "#86efac",
-  tooltipBackground: "#0c1f18",
-  tooltipBorder: "#3f8f68",
-  tooltipText: "#ecfdf5",
+  axis: "#bdeeff",
+  grid: "#1f6f93",
+  line: "#22d3ee",
+  reference: "#7dd3fc",
+  tooltipBackground: "#061523",
+  tooltipBorder: "#38bdf8",
+  tooltipText: "#e0f7ff",
 };
 
 const formatMeasurement = (value: number, unit = "") => {
@@ -135,6 +136,8 @@ function WaveformPanel({
 }: WaveformPanelProps) {
   const measurements = getMeasurements(parameters, data);
   const yAxisDomain = getOscilloscopeYAxisDomain(data);
+  const signalLabel =
+    parameters.type.charAt(0).toUpperCase() + parameters.type.slice(1);
 
   return (
     <section
@@ -147,6 +150,11 @@ function WaveformPanel({
           <p>{data.length.toLocaleString()} generated data points</p>
         </div>
         <div className="waveform-actions">
+          <span className="scope-badge">{signalLabel}</span>
+          <span className="scope-badge">{parameters.frequency} Hz</span>
+          <span className="scope-badge">
+            {parameters.sampleRate.toLocaleString()} samples/s
+          </span>
           <button className="export-button" type="button" onClick={onExportCsv}>
             Export CSV
           </button>
@@ -199,7 +207,7 @@ function WaveformPanel({
             />
             <ReferenceLine
               ifOverflow="extendDomain"
-              stroke="#7dd3a0"
+              stroke={chartTheme.reference}
               strokeDasharray="8 6"
               strokeWidth={1.5}
               y={0}
