@@ -23,10 +23,11 @@ function App() {
   const [parameters, setParameters] = useState<SignalParameters>(
     () => sanitizeSignalParameters(DEFAULT_SIGNAL_PARAMETERS),
   );
+  const [activePresetName, setActivePresetName] = useState<string | null>(null);
 
   const signalData = useMemo(() => generateSignal(parameters), [parameters]);
 
-  const updateParameters = (updates: Partial<SignalParameters>) => {
+  const applyParameters = (updates: Partial<SignalParameters>) => {
     setParameters((currentParameters) =>
       sanitizeSignalParameters({
         ...currentParameters,
@@ -35,7 +36,21 @@ function App() {
     );
   };
 
+  const updateParameters = (updates: Partial<SignalParameters>) => {
+    setActivePresetName(null);
+    applyParameters(updates);
+  };
+
+  const applyPreset = (
+    presetName: string,
+    updates: Partial<SignalParameters>,
+  ) => {
+    setActivePresetName(presetName);
+    applyParameters(updates);
+  };
+
   const resetParameters = () => {
+    setActivePresetName(null);
     setParameters(sanitizeSignalParameters(DEFAULT_SIGNAL_PARAMETERS));
   };
 
@@ -64,11 +79,15 @@ function App() {
             onParametersChange={updateParameters}
             onResetParameters={resetParameters}
           />
-          <SignalPresets onPresetSelect={updateParameters} />
+          <SignalPresets
+            activePresetName={activePresetName}
+            onPresetSelect={applyPreset}
+          />
           <SignalExplanation signalType={parameters.type} />
         </div>
 
         <WaveformPanel
+          activePresetName={activePresetName}
           data={signalData}
           parameters={parameters}
           onExportCsv={exportSignalCsv}

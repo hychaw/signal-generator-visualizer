@@ -65,6 +65,9 @@
   box-shadow:
     0 18px 45px rgba(8, 47, 73, 0.08),
     0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .panel h2 {
@@ -102,6 +105,21 @@
   gap: 12px;
 }
 
+.preset-state {
+  max-width: 150px;
+  border: 1px solid #b5d3e2;
+  border-radius: 999px;
+  background: #eef8fc;
+  color: #0b6387;
+  padding: 4px 9px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .preset-list {
   display: grid;
   gap: 10px;
@@ -127,11 +145,21 @@
     transform 160ms ease;
 }
 
-.preset-button:hover {
+.preset-button:hover,
+.preset-button.is-active {
   border-color: #0891b2;
   background: #ecfeff;
   box-shadow: 0 10px 22px rgba(8, 145, 178, 0.14);
   transform: translateY(-1px);
+}
+
+.preset-button.is-active {
+  border-color: #0ea5e9;
+  background:
+    linear-gradient(180deg, rgba(236, 254, 255, 0.98), rgba(224, 247, 255, 0.98));
+  box-shadow:
+    0 10px 24px rgba(8, 145, 178, 0.16),
+    4px 0 0 #22d3ee inset;
 }
 
 .preset-button:focus-visible {
@@ -314,27 +342,31 @@
 .explanation-list code {
   display: inline-block;
   max-width: 100%;
-  border: 1px solid #cbd9e6;
+  border: 1px solid #9fd0e6;
   border-radius: 6px;
-  background: #f0f9ff;
+  background:
+    linear-gradient(90deg, rgba(14, 165, 233, 0.12), rgba(240, 249, 255, 0.96));
   color: #082f49;
-  padding: 5px 7px;
+  padding: 6px 8px;
+  font-size: 0.86rem;
+  font-weight: 700;
   white-space: normal;
 }
 
 .waveform-panel {
   display: grid;
-  grid-template-rows: auto minmax(430px, 1fr) auto;
-  gap: 18px;
-  min-height: 650px;
+  grid-template-rows: auto auto minmax(480px, 1fr) auto;
+  gap: 16px;
+  min-height: 720px;
   min-width: 0;
-  padding: 24px;
+  padding: 26px;
   border-color: #125f82;
   background:
-    linear-gradient(180deg, rgba(8, 35, 56, 0.98), rgba(3, 19, 32, 0.98));
+    linear-gradient(180deg, rgba(8, 35, 56, 0.99), rgba(3, 17, 29, 0.99));
   box-shadow:
-    0 24px 60px rgba(8, 47, 73, 0.2),
-    0 0 0 1px rgba(56, 189, 248, 0.13) inset;
+    0 28px 70px rgba(8, 47, 73, 0.24),
+    0 0 0 1px rgba(56, 189, 248, 0.16) inset,
+    0 0 42px rgba(34, 211, 238, 0.08) inset;
 }
 
 .waveform-details {
@@ -348,7 +380,7 @@
 .waveform-details h2 {
   margin-bottom: 6px;
   color: #e0f7ff;
-  font-size: 1.1rem;
+  font-size: 1.18rem;
 }
 
 .waveform-details p {
@@ -374,6 +406,35 @@
   font-size: 0.78rem;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.scope-meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.scope-meta span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  border-radius: 6px;
+  background: rgba(3, 31, 51, 0.72);
+  color: #e0f7ff;
+  padding: 8px 10px;
+  font-size: 0.84rem;
+  font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.scope-meta strong {
+  color: #84d9f7;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .export-button {
@@ -406,24 +467,31 @@
 .waveform-chart {
   width: 100%;
   min-width: 0;
-  min-height: 430px;
-  border: 1px solid #1f6f93;
+  min-height: 480px;
+  border: 1px solid rgba(56, 189, 248, 0.34);
   border-radius: 8px;
   background:
-    linear-gradient(rgba(56, 189, 248, 0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(56, 189, 248, 0.12) 1px, transparent 1px),
-    radial-gradient(circle at center, rgba(14, 165, 233, 0.18), transparent 68%),
+    linear-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.15) 1px, transparent 1px),
+    linear-gradient(rgba(56, 189, 248, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.07) 1px, transparent 1px),
+    radial-gradient(circle at center, rgba(14, 165, 233, 0.15), transparent 70%),
     #03111d;
   background-size:
-    32px 32px,
-    32px 32px,
+    80px 80px,
+    80px 80px,
+    16px 16px,
+    16px 16px,
     100% 100%,
     auto;
+  box-shadow:
+    0 0 0 1px rgba(3, 17, 29, 0.85) inset,
+    0 14px 32px rgba(0, 0, 0, 0.22);
   overflow: hidden;
 }
 
 .waveform-chart .recharts-cartesian-grid line {
-  stroke: #1f6f93;
+  stroke: rgba(56, 189, 248, 0.26);
 }
 
 .waveform-chart .recharts-text {
@@ -438,21 +506,35 @@
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
 }
 
+.waveform-chart .recharts-line-curve {
+  filter: drop-shadow(0 0 5px rgba(34, 211, 238, 0.55));
+}
+
 .scope-readout {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(116px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 10px;
   min-width: 0;
 }
 
 .scope-measurement {
   display: grid;
-  gap: 4px;
+  gap: 6px;
   min-width: 0;
-  border: 1px solid rgba(125, 211, 252, 0.22);
+  border: 1px solid rgba(125, 211, 252, 0.26);
   border-radius: 6px;
-  background: rgba(6, 30, 48, 0.78);
-  padding: 10px;
+  background:
+    linear-gradient(180deg, rgba(8, 42, 65, 0.88), rgba(5, 25, 41, 0.9));
+  padding: 11px 12px;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.scope-measurement:hover {
+  border-color: rgba(125, 211, 252, 0.42);
+  transform: translateY(-1px);
 }
 
 .scope-measurement span {
@@ -463,7 +545,7 @@
 
 .scope-measurement strong {
   color: #e0f7ff;
-  font-size: 1rem;
+  font-size: 1.08rem;
   line-height: 1.15;
   overflow-wrap: anywhere;
 }
@@ -544,12 +626,16 @@
   }
 
   .waveform-panel {
-    grid-template-rows: auto minmax(320px, 1fr) auto;
+    grid-template-rows: auto auto minmax(340px, 1fr) auto;
     min-height: 480px;
   }
 
   .waveform-chart {
-    min-height: 320px;
+    min-height: 340px;
+  }
+
+  .scope-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -574,5 +660,9 @@
 
   .secondary-button {
     width: 100%;
+  }
+
+  .scope-meta {
+    grid-template-columns: 1fr;
   }
 }

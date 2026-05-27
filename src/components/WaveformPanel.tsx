@@ -12,6 +12,7 @@ import {
 import type { SignalParameters, SignalPoint } from "../lib/signalTypes";
 
 interface WaveformPanelProps {
+  activePresetName: string | null;
   data: SignalPoint[];
   parameters: SignalParameters;
   onExportCsv: () => void;
@@ -38,6 +39,14 @@ const formatChartValue = (value: unknown) => {
   return String(value);
 };
 
+const formatSeconds = (value: number) => `${value.toFixed(4)} s`;
+
+const formatAmplitude = (value: number) => {
+  const roundedValue = Math.abs(value) >= 10 ? value.toFixed(2) : value.toFixed(3);
+
+  return roundedValue.replace(/\.?0+$/, "");
+};
+
 const chartTheme = {
   axis: "#bdeeff",
   grid: "#1f6f93",
@@ -57,6 +66,17 @@ const formatMeasurement = (value: number, unit = "") => {
         : value.toFixed(3);
 
   return `${formattedValue}${unit}`;
+};
+
+const formatScale = (value: number, unit: string) => {
+  const formattedValue =
+    Math.abs(value) >= 10
+      ? value.toFixed(2)
+      : Math.abs(value) >= 1
+        ? value.toFixed(3)
+        : value.toFixed(4);
+
+  return `${formattedValue.replace(/\.?0+$/, "")} ${unit}`;
 };
 
 const getDataRange = (data: SignalPoint[]) => {
@@ -130,6 +150,7 @@ const getOscilloscopeYAxisDomain = (data: SignalPoint[]): [number, number] => {
 };
 
 function WaveformPanel({
+  activePresetName,
   data,
   parameters,
   onExportCsv,
@@ -138,6 +159,9 @@ function WaveformPanel({
   const yAxisDomain = getOscilloscopeYAxisDomain(data);
   const signalLabel =
     parameters.type.charAt(0).toUpperCase() + parameters.type.slice(1);
+  const timePerDivision = parameters.duration / 10;
+  const amplitudePerDivision = (yAxisDomain[1] - yAxisDomain[0]) / 8;
+  const setupLabel = activePresetName ?? "Custom Signal";
 
   return (
     <section
@@ -147,7 +171,7 @@ function WaveformPanel({
       <div className="waveform-details">
         <div>
           <h2 id="waveform-panel-title">Waveform Preview</h2>
-          <p>{data.length.toLocaleString()} generated data points</p>
+          <p>{setupLabel} - {data.length.toLocaleString()} generated points</p>
         </div>
         <div className="waveform-actions">
           <span className="scope-badge">{signalLabel}</span>
@@ -159,6 +183,25 @@ function WaveformPanel({
             Export CSV
           </button>
         </div>
+      </div>
+
+      <div className="scope-meta" aria-label="Oscilloscope setup">
+        <span>
+          <strong>Time window</strong>
+          {formatScale(parameters.duration, "s")}
+        </span>
+        <span>
+          <strong>Sample rate</strong>
+          {parameters.sampleRate.toLocaleString()} samples/s
+        </span>
+        <span>
+          <strong>Horizontal</strong>
+          {formatScale(timePerDivision, "s/div")}
+        </span>
+        <span>
+          <strong>Vertical</strong>
+          {formatScale(amplitudePerDivision, "amplitude/div")}
+        </span>
       </div>
 
       <div
@@ -218,9 +261,20 @@ function WaveformPanel({
                 borderColor: chartTheme.tooltipBorder,
                 color: chartTheme.tooltipText,
               }}
-              formatter={(value) => [formatChartValue(value), "Amplitude"]}
+              formatter={(value) => [
+                typeof value === "number"
+                  ? formatAmplitude(value)
+                  : formatChartValue(value),
+                "Amplitude",
+              ]}
               itemStyle={{ color: chartTheme.tooltipText }}
-              labelFormatter={(value) => `Time: ${formatChartValue(value)} s`}
+              labelFormatter={(value) =>
+                `Time: ${
+                  typeof value === "number"
+                    ? formatSeconds(value)
+                    : `${formatChartValue(value)} s`
+                }`
+              }
               labelStyle={{ color: chartTheme.tooltipText }}
             />
             <Line

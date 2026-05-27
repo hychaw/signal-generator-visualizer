@@ -10,10 +10,11 @@ Screenshot coming soon.
 
 - Select sine, square, triangle, sawtooth, and pulse signals
 - Adjust frequency, amplitude, phase, DC offset, and duty cycle where applicable
-- Oscilloscope-style waveform display
-- Measurement readouts near the chart
+- Blue oscilloscope-style waveform display with grid, scope labels, and clean tooltips
+- Measurement readout cards for frequency, period, max, min, peak-to-peak, offset, and duty cycle where applicable
 - Educational explanation panel
 - Engineering signal presets
+- Reset Parameters button for quickly returning to the default signal
 - Export waveform samples to CSV
 - Responsive clean UI
 
@@ -71,10 +72,13 @@ On the engineering side, I learned more about signal generation math for common 
 
 - FFT spectrum view
 - Audio playback
+- Trigger level marker
+- Cursor measurement tools
+- Time/div and volts/div controls
 - Filters
 - Bode/frequency response tools
 - Unit tests for signal generation
-- Deploying the app online with GitHub Pages, Netlify, or Vercel
+- Live deployment with GitHub Pages, Netlify, or Vercel
 
 ## License
 
