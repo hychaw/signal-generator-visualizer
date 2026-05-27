@@ -11,7 +11,10 @@ import {
   getSignalCsvFileName,
   signalDataToCsv,
 } from "./lib/csvExport";
-import { generateSignal } from "./lib/signalGenerators";
+import {
+  generateSignal,
+  sanitizeSignalParameters,
+} from "./lib/signalGenerators";
 import {
   DEFAULT_SIGNAL_PARAMETERS,
   type SignalParameters,
@@ -19,16 +22,18 @@ import {
 
 function App() {
   const [parameters, setParameters] = useState<SignalParameters>(
-    DEFAULT_SIGNAL_PARAMETERS,
+    () => sanitizeSignalParameters(DEFAULT_SIGNAL_PARAMETERS),
   );
 
   const signalData = useMemo(() => generateSignal(parameters), [parameters]);
 
   const updateParameters = (updates: Partial<SignalParameters>) => {
-    setParameters((currentParameters) => ({
-      ...currentParameters,
-      ...updates,
-    }));
+    setParameters((currentParameters) =>
+      sanitizeSignalParameters({
+        ...currentParameters,
+        ...updates,
+      }),
+    );
   };
 
   const exportSignalCsv = () => {

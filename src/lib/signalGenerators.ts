@@ -1,29 +1,28 @@
-import type { SignalParameters, SignalPoint } from "./signalTypes";
+import {
+  MAX_GENERATED_POINTS,
+  SIGNAL_PARAMETER_RANGES,
+  type NumericSignalParameterKey,
+  type SignalParameters,
+  type SignalPoint,
+} from "./signalTypes";
 
 const TWO_PI = Math.PI * 2;
-const MIN_FREQUENCY = 0;
-const MAX_FREQUENCY = 20_000;
-const MIN_AMPLITUDE = 0;
-const MAX_AMPLITUDE = 1_000;
-const MIN_SAMPLE_RATE = 10;
-const MAX_SAMPLE_RATE = 192_000;
-const MIN_DURATION = 0.001;
-const MAX_DURATION = 10;
-const MIN_DUTY_CYCLE = 1;
-const MAX_DUTY_CYCLE = 99;
-const MAX_UNIFORM_DISPLAY_POINTS = 2_500;
 const MAX_EDGE_MARKER_CYCLES = 200;
 const EDGE_EPSILON_SECONDS = 1e-9;
 
-interface SanitizedSignalParameters extends SignalParameters {
+export interface SanitizedSignalParameters extends SignalParameters {
   dutyCycle: number;
   phaseCycles: number;
   sampleCount: number;
   sampleStep: number;
 }
 
+export function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
 export function clamp(value: number, min: number, max: number): number {
-  if (!Number.isFinite(value)) {
+  if (!isFiniteNumber(value)) {
     return min;
   }
 
@@ -31,7 +30,7 @@ export function clamp(value: number, min: number, max: number): number {
 }
 
 export function degreesToRadians(degrees: number): number {
-  if (!Number.isFinite(degrees)) {
+  if (!isFiniteNumber(degrees)) {
     return 0;
   }
 
@@ -39,11 +38,25 @@ export function degreesToRadians(degrees: number): number {
 }
 
 export function normalizePhase(phaseDegrees: number): number {
-  if (!Number.isFinite(phaseDegrees)) {
+  if (!isFiniteNumber(phaseDegrees)) {
     return 0;
   }
 
   return (((phaseDegrees / 360) % 1) + 1) % 1;
+}
+
+export function sanitizeNumericSignalParameter(
+  key: NumericSignalParameterKey,
+  value: number,
+): number {
+  const range = SIGNAL_PARAMETER_RANGES[key];
+  const clampedValue = clamp(value, range.min, range.max);
+
+  if (key === "sampleRate" || key === "dutyCycle") {
+    return Math.round(clampedValue);
+  }
+
+  return clampedValue;
 }
 
 export function getCyclePosition(
@@ -59,34 +72,33 @@ export function getCyclePosition(
 export function sanitizeSignalParameters(
   parameters: SignalParameters,
 ): SanitizedSignalParameters {
-  const frequency = clamp(
-    Math.abs(parameters.frequency),
-    MIN_FREQUENCY,
-    MAX_FREQUENCY,
+  const frequency = sanitizeNumericSignalParameter(
+    "frequency",
+    parameters.frequency,
   );
-  const amplitude = clamp(
-    Math.abs(parameters.amplitude),
-    MIN_AMPLITUDE,
-    MAX_AMPLITUDE,
+  const amplitude = sanitizeNumericSignalParameter(
+    "amplitude",
+    parameters.amplitude,
   );
-  const offset = Number.isFinite(parameters.offset) ? parameters.offset : 0;
-  const phase = Number.isFinite(parameters.phase) ? parameters.phase : 0;
-  const dutyCycle = clamp(
+  const offset = sanitizeNumericSignalParameter("offset", parameters.offset);
+  const phase = sanitizeNumericSignalParameter("phase", parameters.phase);
+  const dutyCycle = sanitizeNumericSignalParameter(
+    "dutyCycle",
     parameters.dutyCycle,
-    MIN_DUTY_CYCLE,
-    MAX_DUTY_CYCLE,
   );
-  const sampleRate = clamp(
-    Math.round(parameters.sampleRate),
-    MIN_SAMPLE_RATE,
-    MAX_SAMPLE_RATE,
+  const sampleRate = sanitizeNumericSignalParameter(
+    "sampleRate",
+    parameters.sampleRate,
   );
-  const duration = clamp(parameters.duration, MIN_DURATION, MAX_DURATION);
+  const duration = sanitizeNumericSignalParameter(
+    "duration",
+    parameters.duration,
+  );
   const requestedSampleCount = Math.max(
     2,
     Math.floor(sampleRate * duration) + 1,
   );
-  const sampleCount = Math.min(requestedSampleCount, MAX_UNIFORM_DISPLAY_POINTS);
+  const sampleCount = Math.min(requestedSampleCount, MAX_GENERATED_POINTS);
 
   return {
     ...parameters,
@@ -140,10 +152,11 @@ function makePoint(
   parameters: SanitizedSignalParameters,
   time: number,
 ): SignalPoint {
+  const safeTime = isFiniteNumber(time) ? time : 0;
   const cyclePosition =
     parameters.frequency === 0
       ? parameters.phaseCycles
-      : getCyclePosition(time, parameters.frequency, parameters.phaseCycles);
+      : getCyclePosition(safeTime, parameters.frequency, parameters.phaseCycles);
   const baseWaveform = waveformValue(
     parameters.type,
     cyclePosition,
@@ -152,7 +165,7 @@ function makePoint(
   const y = parameters.offset + parameters.amplitude * baseWaveform;
 
   return {
-    t: time,
+    t: safeTime,
     y: Number.isFinite(y) ? y : parameters.offset,
   };
 }
@@ -204,7 +217,7 @@ export function generateSignal(parameters: SignalParameters): SignalPoint[] {
     makePoint(sanitizedParameters, time),
   );
 
-  return [...points, ...transitionPoints].sort(
-    (firstPoint, secondPoint) => firstPoint.t - secondPoint.t,
-  );
+  return [...points, ...transitionPoints]
+    .filter((point) => isFiniteNumber(point.t) && isFiniteNumber(point.y))
+    .sort((firstPoint, secondPoint) => firstPoint.t - secondPoint.t);
 }

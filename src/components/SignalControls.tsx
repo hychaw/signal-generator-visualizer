@@ -1,21 +1,29 @@
-import type { SignalParameters, SignalType } from "../lib/signalTypes";
+import { useState } from "react";
+
+import {
+  isFiniteNumber,
+  sanitizeNumericSignalParameter,
+} from "../lib/signalGenerators";
+import {
+  SIGNAL_PARAMETER_RANGES,
+  type NumericSignalParameterKey,
+  type SignalParameters,
+  type SignalType,
+} from "../lib/signalTypes";
 
 interface SignalControlsProps {
   parameters: SignalParameters;
   onParametersChange: (updates: Partial<SignalParameters>) => void;
 }
 
-type NumericParameterKey = keyof Pick<
+type NumericControlKey = keyof Pick<
   SignalParameters,
   "frequency" | "amplitude" | "phase" | "offset" | "dutyCycle"
 >;
 
 interface NumericControlConfig {
-  key: NumericParameterKey;
+  key: NumericControlKey;
   label: string;
-  min: number;
-  max: number;
-  step: number;
   unit?: string;
 }
 
@@ -31,39 +39,24 @@ const NUMERIC_CONTROLS: NumericControlConfig[] = [
   {
     key: "frequency",
     label: "Frequency",
-    min: 1,
-    max: 100,
-    step: 1,
     unit: "Hz",
   },
   {
     key: "amplitude",
     label: "Amplitude",
-    min: 0.1,
-    max: 5,
-    step: 0.1,
   },
   {
     key: "phase",
     label: "Phase",
-    min: 0,
-    max: 360,
-    step: 1,
     unit: "deg",
   },
   {
     key: "offset",
     label: "DC offset",
-    min: -5,
-    max: 5,
-    step: 0.1,
   },
   {
     key: "dutyCycle",
     label: "Duty cycle",
-    min: 1,
-    max: 99,
-    step: 1,
     unit: "%",
   },
 ];
@@ -78,21 +71,52 @@ function isSignalType(value: string): value is SignalType {
   return SIGNAL_TYPES.some((signalType) => signalType === value);
 }
 
+function formatParameterValue(value: number): string {
+  return Number.isInteger(value) ? value.toString() : String(value);
+}
+
 function SignalControls({
   parameters,
   onParametersChange,
 }: SignalControlsProps) {
   const shouldShowDutyCycle = DUTY_CYCLE_SIGNAL_TYPES.includes(parameters.type);
+  const [activeInput, setActiveInput] = useState<NumericControlKey | null>(null);
+  const [draftValue, setDraftValue] = useState("");
 
   const updateNumericParameter = (
-    key: NumericParameterKey,
+    key: NumericSignalParameterKey,
     value: number,
   ) => {
-    if (!Number.isFinite(value)) {
+    if (!isFiniteNumber(value)) {
       return;
     }
 
-    onParametersChange({ [key]: value });
+    onParametersChange({ [key]: sanitizeNumericSignalParameter(key, value) });
+  };
+
+  const updateDraftParameter = (key: NumericControlKey, value: string) => {
+    setDraftValue(value);
+
+    if (value.trim() === "") {
+      return;
+    }
+
+    const numericValue = Number(value);
+
+    if (isFiniteNumber(numericValue)) {
+      updateNumericParameter(key, numericValue);
+    }
+  };
+
+  const commitDraftParameter = (key: NumericControlKey) => {
+    const numericValue = Number(draftValue);
+
+    if (draftValue.trim() !== "" && isFiniteNumber(numericValue)) {
+      updateNumericParameter(key, numericValue);
+    }
+
+    setActiveInput(null);
+    setDraftValue("");
   };
 
   const updateSignalType = (value: string) => {
@@ -125,6 +149,7 @@ function SignalControls({
         (control) => control.key !== "dutyCycle" || shouldShowDutyCycle,
       ).map((control) => {
         const controlId = `signal-${control.key}`;
+        const range = SIGNAL_PARAMETER_RANGES[control.key];
         const value = parameters[control.key];
 
         return (
@@ -139,9 +164,9 @@ function SignalControls({
             <div className="parameter-input-row">
               <input
                 id={controlId}
-                max={control.max}
-                min={control.min}
-                step={control.step}
+                max={range.max}
+                min={range.min}
+                step={range.step}
                 type="range"
                 value={value}
                 onChange={(event) =>
@@ -151,17 +176,26 @@ function SignalControls({
               <div className="number-input-with-unit">
                 <input
                   aria-label={`${control.label} value`}
-                  max={control.max}
-                  min={control.min}
-                  step={control.step}
+                  max={range.max}
+                  min={range.min}
+                  step={range.step}
                   type="number"
-                  value={value}
+                  value={
+                    activeInput === control.key
+                      ? draftValue
+                      : formatParameterValue(value)
+                  }
+                  onBlur={() => commitDraftParameter(control.key)}
                   onChange={(event) =>
-                    updateNumericParameter(
+                    updateDraftParameter(
                       control.key,
-                      event.target.valueAsNumber,
+                      event.target.value,
                     )
                   }
+                  onFocus={() => {
+                    setActiveInput(control.key);
+                    setDraftValue(formatParameterValue(value));
+                  }}
                 />
                 {control.unit ? (
                   <span aria-hidden="true">{control.unit}</span>
