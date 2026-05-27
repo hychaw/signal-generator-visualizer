@@ -35,7 +35,7 @@ export const SIGNAL_PARAMETER_RANGES: Record<
   },
   amplitude: {
     min: 0.1,
-    max: 5,
+    max: 10,
     step: 0.1,
   },
   phase: {
@@ -44,8 +44,8 @@ export const SIGNAL_PARAMETER_RANGES: Record<
     step: 1,
   },
   offset: {
-    min: -5,
-    max: 5,
+    min: -10,
+    max: 10,
     step: 0.1,
   },
   dutyCycle: {

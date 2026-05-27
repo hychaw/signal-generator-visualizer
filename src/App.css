@@ -1,5 +1,5 @@
 .app {
-  width: min(1240px, 100%);
+  width: min(1320px, 100%);
   max-width: 100vw;
   margin: 0 auto;
   padding: 42px 24px 36px;
@@ -22,7 +22,7 @@
   color: #0e7490;
   font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   padding: 5px 10px;
   text-transform: uppercase;
 }
@@ -44,7 +44,7 @@
 
 .dashboard {
   display: grid;
-  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  grid-template-columns: minmax(280px, 326px) minmax(0, 1fr);
   gap: 26px;
   align-items: start;
   min-width: 0;
@@ -356,17 +356,18 @@
 .waveform-panel {
   display: grid;
   grid-template-rows: auto auto minmax(480px, 1fr) auto;
-  gap: 16px;
+  gap: 18px;
   min-height: 720px;
   min-width: 0;
-  padding: 26px;
-  border-color: #125f82;
+  padding: 28px;
+  border-color: rgba(56, 189, 248, 0.48);
   background:
-    linear-gradient(180deg, rgba(8, 35, 56, 0.99), rgba(3, 17, 29, 0.99));
+    linear-gradient(180deg, rgba(8, 37, 59, 0.99), rgba(3, 17, 29, 0.99));
   box-shadow:
-    0 28px 70px rgba(8, 47, 73, 0.24),
-    0 0 0 1px rgba(56, 189, 248, 0.16) inset,
-    0 0 42px rgba(34, 211, 238, 0.08) inset;
+    0 32px 78px rgba(8, 47, 73, 0.3),
+    0 0 0 1px rgba(56, 189, 248, 0.22) inset,
+    0 0 46px rgba(34, 211, 238, 0.1) inset,
+    0 0 30px rgba(14, 165, 233, 0.1);
 }
 
 .waveform-details {
@@ -468,7 +469,7 @@
   width: 100%;
   min-width: 0;
   min-height: 480px;
-  border: 1px solid rgba(56, 189, 248, 0.34);
+  border: 1px solid rgba(56, 189, 248, 0.42);
   border-radius: 8px;
   background:
     linear-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 1px),
@@ -486,7 +487,8 @@
     auto;
   box-shadow:
     0 0 0 1px rgba(3, 17, 29, 0.85) inset,
-    0 14px 32px rgba(0, 0, 0, 0.22);
+    0 0 28px rgba(34, 211, 238, 0.12) inset,
+    0 16px 36px rgba(0, 0, 0, 0.26);
   overflow: hidden;
 }
 
@@ -512,9 +514,13 @@
 
 .scope-readout {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 10px;
   min-width: 0;
+}
+
+.scope-readout.has-duty-cycle {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
 .scope-measurement {
@@ -539,13 +545,15 @@
 
 .scope-measurement span {
   color: #a7d7e8;
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .scope-measurement strong {
   color: #e0f7ff;
-  font-size: 1.08rem;
+  font-size: clamp(0.95rem, 1.1vw, 1.08rem);
   line-height: 1.15;
   overflow-wrap: anywhere;
 }
@@ -554,6 +562,17 @@
   margin: 24px 0 0;
   color: #52687d;
   font-size: 0.95rem;
+}
+
+@media (max-width: 1180px) {
+  .scope-readout,
+  .scope-readout.has-duty-cycle {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .scope-readout.has-duty-cycle .scope-measurement:first-child {
+    grid-column: span 2;
+  }
 }
 
 @media (max-width: 980px) {
@@ -637,6 +656,15 @@
   .scope-meta {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .scope-readout,
+  .scope-readout.has-duty-cycle {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .scope-readout.has-duty-cycle .scope-measurement:first-child {
+    grid-column: auto;
+  }
 }
 
 @media (max-width: 430px) {
@@ -663,6 +691,11 @@
   }
 
   .scope-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .scope-readout,
+  .scope-readout.has-duty-cycle {
     grid-template-columns: 1fr;
   }
 }

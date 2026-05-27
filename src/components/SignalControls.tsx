@@ -25,7 +25,6 @@ type NumericControlKey = keyof Pick<
 interface NumericControlConfig {
   key: NumericControlKey;
   label: string;
-  unit?: string;
 }
 
 const SIGNAL_TYPES: SignalType[] = [
@@ -39,8 +38,7 @@ const SIGNAL_TYPES: SignalType[] = [
 const NUMERIC_CONTROLS: NumericControlConfig[] = [
   {
     key: "frequency",
-    label: "Frequency",
-    unit: "Hz",
+    label: "Frequency (Hz)",
   },
   {
     key: "amplitude",
@@ -48,17 +46,15 @@ const NUMERIC_CONTROLS: NumericControlConfig[] = [
   },
   {
     key: "phase",
-    label: "Phase",
-    unit: "deg",
+    label: "Phase (deg)",
   },
   {
     key: "offset",
-    label: "DC offset",
+    label: "DC Offset",
   },
   {
     key: "dutyCycle",
-    label: "Duty cycle",
-    unit: "%",
+    label: "Duty Cycle (%)",
   },
 ];
 
@@ -173,9 +169,6 @@ function SignalControls({
           <div className="field numeric-field" key={control.key}>
             <label htmlFor={controlId}>
               {control.label}
-              {control.unit ? (
-                <span className="unit"> {control.unit}</span>
-              ) : null}
             </label>
 
             <div className="parameter-input-row">
@@ -214,9 +207,6 @@ function SignalControls({
                     setDraftValue(formatParameterValue(value));
                   }}
                 />
-                {control.unit ? (
-                  <span aria-hidden="true">{control.unit}</span>
-                ) : null}
               </div>
             </div>
           </div>
