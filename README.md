@@ -4,7 +4,7 @@ A React + TypeScript web app for visualizing common engineering waveforms such a
 
 ## Demo / Screenshot
 
-Screenshot coming soon.
+![Signal Generator Visualizer Screenshot](public/Signal%20Generator%20Visualizer%20UI.png)
 
 ## Features
 
