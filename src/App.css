@@ -332,6 +332,71 @@
   font-size: 1.1rem;
 }
 
+.waveform-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.mode-toggle {
+  display: inline-flex;
+  gap: 9px;
+  align-items: center;
+  min-height: 40px;
+  color: #273449;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mode-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mode-toggle-track {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  flex: 0 0 auto;
+  border: 1px solid #9aa9ba;
+  border-radius: 999px;
+  background: #e8edf4;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.mode-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.22);
+  transition: transform 160ms ease;
+}
+
+.mode-toggle input:checked + .mode-toggle-track {
+  border-color: #0f766e;
+  background: #0f766e;
+}
+
+.mode-toggle input:checked + .mode-toggle-track .mode-toggle-thumb {
+  transform: translateX(20px);
+}
+
+.mode-toggle input:focus-visible + .mode-toggle-track {
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.24);
+}
+
 .export-button {
   min-height: 40px;
   border: 1px solid #0d766c;
@@ -386,6 +451,81 @@
   border: 1px solid #cbd5e1 !important;
   border-radius: 6px;
   box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12);
+}
+
+.waveform-panel-oscilloscope {
+  border-color: #2f6f55;
+  background: #10231c;
+  box-shadow:
+    0 18px 45px rgba(15, 23, 42, 0.16),
+    0 0 0 1px rgba(134, 239, 172, 0.08) inset;
+}
+
+.waveform-panel-oscilloscope h2,
+.waveform-panel-oscilloscope .mode-toggle {
+  color: #ecfdf5;
+}
+
+.waveform-panel-oscilloscope p {
+  color: #b7d7c2;
+}
+
+.waveform-chart-oscilloscope {
+  border-color: #3f8f68;
+  background:
+    linear-gradient(rgba(134, 239, 172, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(134, 239, 172, 0.12) 1px, transparent 1px),
+    radial-gradient(circle at center, rgba(21, 128, 61, 0.18), transparent 68%),
+    #07130f;
+  background-size:
+    32px 32px,
+    32px 32px,
+    100% 100%,
+    auto;
+}
+
+.waveform-chart-oscilloscope .recharts-cartesian-grid line {
+  stroke: #2f6f55;
+}
+
+.waveform-chart-oscilloscope .recharts-text {
+  fill: #c8facc;
+}
+
+.waveform-chart-oscilloscope .recharts-default-tooltip {
+  border-color: #3f8f68 !important;
+  background: #0c1f18 !important;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
+}
+
+.scope-readout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(116px, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.scope-measurement {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  border: 1px solid rgba(134, 239, 172, 0.22);
+  border-radius: 6px;
+  background: rgba(7, 19, 15, 0.72);
+  padding: 10px;
+}
+
+.scope-measurement span {
+  color: #b7d7c2;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.scope-measurement strong {
+  color: #ecfdf5;
+  font-size: 1rem;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .note {
@@ -448,6 +588,14 @@
   .waveform-details {
     display: grid;
     gap: 12px;
+  }
+
+  .waveform-actions {
+    justify-content: stretch;
+  }
+
+  .mode-toggle {
+    width: 100%;
   }
 
   .export-button {

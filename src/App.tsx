@@ -24,6 +24,7 @@ function App() {
   const [parameters, setParameters] = useState<SignalParameters>(
     () => sanitizeSignalParameters(DEFAULT_SIGNAL_PARAMETERS),
   );
+  const [oscilloscopeMode, setOscilloscopeMode] = useState(false);
 
   const signalData = useMemo(() => generateSignal(parameters), [parameters]);
 
@@ -64,7 +65,13 @@ function App() {
           <SignalExplanation signalType={parameters.type} />
         </div>
 
-        <WaveformPanel data={signalData} onExportCsv={exportSignalCsv} />
+        <WaveformPanel
+          data={signalData}
+          oscilloscopeMode={oscilloscopeMode}
+          parameters={parameters}
+          onExportCsv={exportSignalCsv}
+          onOscilloscopeModeChange={setOscilloscopeMode}
+        />
       </section>
 
       <p className="note">
