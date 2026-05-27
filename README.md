@@ -2,7 +2,11 @@
 
 A React + TypeScript web app for visualizing common engineering waveforms such as sine, square, triangle, sawtooth, and pulse signals.
 
-## Demo / Screenshot
+## Live Demo
+
+Try the app here: https://signal-generator-visualizer.vercel.app/
+
+## Screenshot
 
 ![Signal Generator Visualizer Screenshot](public/Signal%20Generator%20Visualizer%20UI.png)
 
@@ -78,7 +82,6 @@ On the engineering side, I learned more about signal generation math for common 
 - Filters
 - Bode/frequency response tools
 - Unit tests for signal generation
-- Live deployment with GitHub Pages, Netlify, or Vercel
 
 ## License
 
