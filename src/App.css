@@ -195,11 +195,6 @@
   font-weight: 700;
 }
 
-.field .unit {
-  color: #5f748a;
-  font-weight: 600;
-}
-
 .field input,
 .field select {
   width: 100%;
@@ -253,13 +248,6 @@
 .number-input-with-unit input {
   min-width: 0;
   text-align: right;
-}
-
-.number-input-with-unit span {
-  min-width: 24px;
-  color: #64748b;
-  font-size: 0.84rem;
-  font-weight: 700;
 }
 
 .field input:focus-visible,
