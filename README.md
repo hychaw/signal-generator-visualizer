@@ -1,73 +1,80 @@
-# React + TypeScript + Vite
+# Signal Generator Visualizer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + TypeScript web app for visualizing common engineering waveforms such as sine, square, triangle, sawtooth, and pulse signals.
 
-Currently, two official plugins are available:
+## Demo / Screenshot
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Screenshot coming soon.
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Select sine, square, triangle, sawtooth, and pulse signals
+- Adjust frequency, amplitude, phase, DC offset, and duty cycle where applicable
+- Real-time waveform chart
+- Educational explanation panel
+- Engineering signal presets
+- Export waveform samples to CSV
+- Responsive clean UI
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Vite
+- React
+- TypeScript
+- Recharts
+- CSS
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## How to Run Locally
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Clone the repository:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone https://github.com/hychaw/signal-generator-visualizer.git
+cd signal-generator-visualizer
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Install dependencies:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Create a production build:
+
+```bash
+npm run build
+```
+
+## Project Structure
+
+```text
+src/
+  components/   Reusable React UI components for controls, presets, explanations, and the waveform chart
+  lib/          Signal types, generation math, preset data, and CSV export helpers
+  App.tsx       Main application component that connects state, controls, generated data, and UI sections
+```
+
+## What I Learned
+
+This project helped me practice building a React application with a clear component structure and reusable UI pieces. I also worked with TypeScript types to keep signal settings, presets, and generated waveform data more organized.
+
+On the engineering side, I learned more about signal generation math for common waveforms, including how parameters like frequency, amplitude, phase, DC offset, and duty cycle affect the final signal. I also gained experience charting live data with Recharts, exporting generated samples to CSV in the browser, and using a Git/GitHub workflow to build the project step by step.
+
+## Future Improvements
+
+- FFT spectrum view
+- Audio playback
+- Oscilloscope-style grid
+- Filters
+- Bode/frequency response tools
+- Unit tests for signal generation
+
+## License
+
+This project is licensed under the MIT License.
