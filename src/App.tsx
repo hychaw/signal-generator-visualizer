@@ -6,6 +6,11 @@ import SignalControls from "./components/SignalControls";
 import SignalExplanation from "./components/SignalExplanation";
 import SignalPresets from "./components/SignalPresets";
 import WaveformPanel from "./components/WaveformPanel";
+import {
+  downloadCsvFile,
+  getSignalCsvFileName,
+  signalDataToCsv,
+} from "./lib/csvExport";
 import { generateSignal } from "./lib/signalGenerators";
 import {
   DEFAULT_SIGNAL_PARAMETERS,
@@ -24,6 +29,13 @@ function App() {
       ...currentParameters,
       ...updates,
     }));
+  };
+
+  const exportSignalCsv = () => {
+    downloadCsvFile(
+      signalDataToCsv(signalData),
+      getSignalCsvFileName(parameters.type),
+    );
   };
 
   return (
@@ -47,7 +59,7 @@ function App() {
           <SignalExplanation signalType={parameters.type} />
         </div>
 
-        <WaveformPanel data={signalData} />
+        <WaveformPanel data={signalData} onExportCsv={exportSignalCsv} />
       </section>
 
       <p className="note">

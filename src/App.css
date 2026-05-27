@@ -284,11 +284,32 @@
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  align-items: baseline;
+  align-items: start;
 }
 
 .waveform-details h2 {
-  margin-bottom: 0;
+  margin-bottom: 6px;
+}
+
+.export-button {
+  min-height: 40px;
+  border: 1px solid #0f766e;
+  border-radius: 6px;
+  background: #0f766e;
+  color: #ffffff;
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.export-button:hover {
+  background: #115e59;
+}
+
+.export-button:focus {
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.18);
+  outline: none;
 }
 
 .waveform-chart {

@@ -12,6 +12,7 @@ import type { SignalPoint } from "../lib/signalTypes";
 
 interface WaveformPanelProps {
   data: SignalPoint[];
+  onExportCsv: () => void;
 }
 
 const formatChartValue = (value: unknown) => {
@@ -30,15 +31,20 @@ const formatChartValue = (value: unknown) => {
   return String(value);
 };
 
-function WaveformPanel({ data }: WaveformPanelProps) {
+function WaveformPanel({ data, onExportCsv }: WaveformPanelProps) {
   return (
     <section
       className="panel waveform-panel"
       aria-labelledby="waveform-panel-title"
     >
       <div className="waveform-details">
-        <h2 id="waveform-panel-title">Waveform Preview</h2>
-        <p>{data.length.toLocaleString()} generated data points</p>
+        <div>
+          <h2 id="waveform-panel-title">Waveform Preview</h2>
+          <p>{data.length.toLocaleString()} generated data points</p>
+        </div>
+        <button className="export-button" type="button" onClick={onExportCsv}>
+          Export CSV
+        </button>
       </div>
 
       <div className="waveform-chart" role="img" aria-label="Generated signal waveform chart">
