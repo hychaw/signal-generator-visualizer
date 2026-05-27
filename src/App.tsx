@@ -4,6 +4,7 @@ import "./App.css";
 import ParameterSummary from "./components/ParameterSummary";
 import SignalControls from "./components/SignalControls";
 import SignalExplanation from "./components/SignalExplanation";
+import SignalPresets from "./components/SignalPresets";
 import WaveformPanel from "./components/WaveformPanel";
 import { generateSignal } from "./lib/signalGenerators";
 import {
@@ -41,6 +42,7 @@ function App() {
             parameters={parameters}
             onParametersChange={updateParameters}
           />
+          <SignalPresets onPresetSelect={updateParameters} />
           <ParameterSummary parameters={parameters} />
           <SignalExplanation signalType={parameters.type} />
         </div>
