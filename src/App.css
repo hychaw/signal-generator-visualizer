@@ -65,7 +65,7 @@
 
 .controls-panel {
   display: grid;
-  gap: 16px;
+  gap: 18px;
 }
 
 .field {
@@ -73,10 +73,16 @@
   gap: 6px;
 }
 
-.field span {
+.field > span,
+.field label {
   color: #334155;
   font-size: 0.9rem;
   font-weight: 700;
+}
+
+.field .unit {
+  color: #64748b;
+  font-weight: 600;
 }
 
 .field input,
@@ -88,6 +94,43 @@
   background: #ffffff;
   color: #172033;
   padding: 8px 10px;
+}
+
+.numeric-field {
+  gap: 8px;
+}
+
+.parameter-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 94px;
+  gap: 12px;
+  align-items: center;
+}
+
+.parameter-input-row input[type="range"] {
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  accent-color: #0f766e;
+}
+
+.number-input-with-unit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.number-input-with-unit input {
+  min-width: 0;
+  text-align: right;
+}
+
+.number-input-with-unit span {
+  min-width: 24px;
+  color: #64748b;
+  font-size: 0.84rem;
+  font-weight: 700;
 }
 
 .field input:focus,
@@ -229,5 +272,13 @@
 
   .dashboard {
     grid-template-columns: 1fr;
+  }
+
+  .parameter-input-row {
+    grid-template-columns: 1fr;
+  }
+
+  .number-input-with-unit {
+    grid-template-columns: minmax(0, 120px) auto;
   }
 }
