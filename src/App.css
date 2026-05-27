@@ -177,86 +177,30 @@
 
 .waveform-panel {
   display: grid;
-  gap: 24px;
+  grid-template-rows: auto minmax(320px, 1fr);
+  gap: 18px;
   min-height: 520px;
-  background:
-    linear-gradient(#e7edf6 1px, transparent 1px),
-    linear-gradient(90deg, #e7edf6 1px, transparent 1px),
-    #ffffff;
-  background-size: 32px 32px;
-}
-
-.waveform-placeholder {
-  position: relative;
-  min-height: 240px;
-  border: 1px solid #d8dee9;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.92);
-  overflow: hidden;
-}
-
-.waveform-placeholder::before {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  left: 0;
-  height: 1px;
-  background: #c8d2df;
-  content: "";
-}
-
-.waveform-line {
-  position: absolute;
-  inset: 28px 18px;
-  background:
-    linear-gradient(135deg, transparent 45%, #0f766e 46%, #0f766e 54%, transparent 55%) 0
-      45% / 72px 72px repeat-x;
-  opacity: 0.8;
+  min-width: 0;
 }
 
 .waveform-details {
-  align-self: end;
-  padding: 18px;
-  border: 1px solid #d8dee9;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: baseline;
 }
 
 .waveform-details h2 {
-  margin-bottom: 8px;
+  margin-bottom: 0;
 }
 
-.point-preview {
+.waveform-chart {
   width: 100%;
-  margin-top: 16px;
-  border-collapse: collapse;
-  color: #243044;
-  font-size: 0.92rem;
-}
-
-.point-preview caption {
-  margin-bottom: 8px;
-  color: #64748b;
-  font-weight: 700;
-  text-align: left;
-}
-
-.point-preview th,
-.point-preview td {
-  border-bottom: 1px solid #edf1f6;
-  padding: 8px 0;
-  text-align: right;
-}
-
-.point-preview th:first-child,
-.point-preview td:first-child {
-  text-align: left;
-}
-
-.point-preview th {
-  color: #334155;
-  font-size: 0.82rem;
-  text-transform: uppercase;
+  min-width: 0;
+  min-height: 320px;
+  border: 1px solid #d8dee9;
+  border-radius: 8px;
+  background: #ffffff;
 }
 
 .note {
@@ -280,5 +224,10 @@
 
   .number-input-with-unit {
     grid-template-columns: minmax(0, 120px) auto;
+  }
+
+  .waveform-details {
+    display: grid;
+    gap: 6px;
   }
 }
