@@ -13,10 +13,8 @@ import type { SignalParameters, SignalPoint } from "../lib/signalTypes";
 
 interface WaveformPanelProps {
   data: SignalPoint[];
-  oscilloscopeMode: boolean;
   parameters: SignalParameters;
   onExportCsv: () => void;
-  onOscilloscopeModeChange: (enabled: boolean) => void;
 }
 
 interface Measurement {
@@ -41,22 +39,12 @@ const formatChartValue = (value: unknown) => {
 };
 
 const chartTheme = {
-  standard: {
-    axis: "#475569",
-    grid: "#e2e8f0",
-    line: "#0f766e",
-    tooltipBackground: "#ffffff",
-    tooltipBorder: "#cbd5e1",
-    tooltipText: "#172033",
-  },
-  oscilloscope: {
-    axis: "#c8facc",
-    grid: "#2f6f55",
-    line: "#86efac",
-    tooltipBackground: "#0c1f18",
-    tooltipBorder: "#3f8f68",
-    tooltipText: "#ecfdf5",
-  },
+  axis: "#c8facc",
+  grid: "#2f6f55",
+  line: "#86efac",
+  tooltipBackground: "#0c1f18",
+  tooltipBorder: "#3f8f68",
+  tooltipText: "#ecfdf5",
 };
 
 const formatMeasurement = (value: number, unit = "") => {
@@ -104,26 +92,26 @@ const getMeasurements = (
       value: formatMeasurement(period, " s"),
     },
     {
-      label: "Max",
+      label: "Max amplitude",
       value: formatMeasurement(max),
     },
     {
-      label: "Min",
+      label: "Min amplitude",
       value: formatMeasurement(min),
     },
     {
-      label: "Peak-to-Peak",
+      label: "Peak-to-peak",
       value: formatMeasurement(max - min),
     },
     {
-      label: "Offset",
+      label: "DC offset",
       value: formatMeasurement(dcOffset),
     },
   ];
 
   if (parameters.type === "square" || parameters.type === "pulse") {
     measurements.push({
-      label: "Duty Cycle",
+      label: "Duty cycle",
       value: formatMeasurement(parameters.dutyCycle, "%"),
     });
   }
@@ -142,20 +130,15 @@ const getOscilloscopeYAxisDomain = (data: SignalPoint[]): [number, number] => {
 
 function WaveformPanel({
   data,
-  oscilloscopeMode,
   parameters,
   onExportCsv,
-  onOscilloscopeModeChange,
 }: WaveformPanelProps) {
-  const theme = oscilloscopeMode ? chartTheme.oscilloscope : chartTheme.standard;
   const measurements = getMeasurements(parameters, data);
-  const yAxisDomain = oscilloscopeMode
-    ? getOscilloscopeYAxisDomain(data)
-    : undefined;
+  const yAxisDomain = getOscilloscopeYAxisDomain(data);
 
   return (
     <section
-      className={`panel waveform-panel${oscilloscopeMode ? " waveform-panel-oscilloscope" : ""}`}
+      className="panel waveform-panel"
       aria-labelledby="waveform-panel-title"
     >
       <div className="waveform-details">
@@ -164,19 +147,6 @@ function WaveformPanel({
           <p>{data.length.toLocaleString()} generated data points</p>
         </div>
         <div className="waveform-actions">
-          <label className="mode-toggle">
-            <input
-              checked={oscilloscopeMode}
-              onChange={(event) =>
-                onOscilloscopeModeChange(event.target.checked)
-              }
-              type="checkbox"
-            />
-            <span className="mode-toggle-track" aria-hidden="true">
-              <span className="mode-toggle-thumb" />
-            </span>
-            <span>Oscilloscope Mode</span>
-          </label>
           <button className="export-button" type="button" onClick={onExportCsv}>
             Export CSV
           </button>
@@ -184,7 +154,7 @@ function WaveformPanel({
       </div>
 
       <div
-        className={`waveform-chart${oscilloscopeMode ? " waveform-chart-oscilloscope" : ""}`}
+        className="waveform-chart"
         role="img"
         aria-label="Generated signal waveform chart"
       >
@@ -194,8 +164,8 @@ function WaveformPanel({
             margin={{ top: 16, right: 24, bottom: 28, left: 16 }}
           >
             <CartesianGrid
-              stroke={theme.grid}
-              strokeDasharray={oscilloscopeMode ? "2 6" : "4 4"}
+              stroke={chartTheme.grid}
+              strokeDasharray="2 6"
             />
             <XAxis
               dataKey="t"
@@ -203,10 +173,10 @@ function WaveformPanel({
                 value: "Time (s)",
                 position: "insideBottom",
                 offset: -18,
-                fill: theme.axis,
+                fill: chartTheme.axis,
               }}
-              stroke={theme.axis}
-              tick={{ fill: theme.axis }}
+              stroke={chartTheme.axis}
+              tick={{ fill: chartTheme.axis }}
               tickFormatter={(value: number) => value.toFixed(2)}
               tickMargin={8}
               type="number"
@@ -219,40 +189,38 @@ function WaveformPanel({
                 angle: -90,
                 position: "insideLeft",
                 offset: 0,
-                fill: theme.axis,
+                fill: chartTheme.axis,
               }}
-              stroke={theme.axis}
-              tick={{ fill: theme.axis }}
+              stroke={chartTheme.axis}
+              tick={{ fill: chartTheme.axis }}
               tickFormatter={(value: number) => value.toFixed(2)}
               tickMargin={8}
               type="number"
             />
-            {oscilloscopeMode && (
-              <ReferenceLine
-                ifOverflow="extendDomain"
-                stroke="#7dd3a0"
-                strokeDasharray="8 6"
-                strokeWidth={1.5}
-                y={0}
-              />
-            )}
+            <ReferenceLine
+              ifOverflow="extendDomain"
+              stroke="#7dd3a0"
+              strokeDasharray="8 6"
+              strokeWidth={1.5}
+              y={0}
+            />
             <Tooltip
               contentStyle={{
-                backgroundColor: theme.tooltipBackground,
-                borderColor: theme.tooltipBorder,
-                color: theme.tooltipText,
+                backgroundColor: chartTheme.tooltipBackground,
+                borderColor: chartTheme.tooltipBorder,
+                color: chartTheme.tooltipText,
               }}
               formatter={(value) => [formatChartValue(value), "Amplitude"]}
-              itemStyle={{ color: theme.tooltipText }}
+              itemStyle={{ color: chartTheme.tooltipText }}
               labelFormatter={(value) => `Time: ${formatChartValue(value)} s`}
-              labelStyle={{ color: theme.tooltipText }}
+              labelStyle={{ color: chartTheme.tooltipText }}
             />
             <Line
               dataKey="y"
               dot={false}
               isAnimationActive={false}
               name="Amplitude"
-              stroke={theme.line}
+              stroke={chartTheme.line}
               strokeWidth={2}
               type="linear"
             />
@@ -260,19 +228,14 @@ function WaveformPanel({
         </ResponsiveContainer>
       </div>
 
-      {oscilloscopeMode && (
-        <section
-          className="scope-readout"
-          aria-label="Oscilloscope measurements"
-        >
-          {measurements.map((measurement) => (
-            <div className="scope-measurement" key={measurement.label}>
-              <span>{measurement.label}</span>
-              <strong>{measurement.value}</strong>
-            </div>
-          ))}
-        </section>
-      )}
+      <section className="scope-readout" aria-label="Signal measurements">
+        {measurements.map((measurement) => (
+          <div className="scope-measurement" key={measurement.label}>
+            <span>{measurement.label}</span>
+            <strong>{measurement.value}</strong>
+          </div>
+        ))}
+      </section>
     </section>
   );
 }

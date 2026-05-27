@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import "./App.css";
 
-import ParameterSummary from "./components/ParameterSummary";
 import SignalControls from "./components/SignalControls";
 import SignalExplanation from "./components/SignalExplanation";
 import SignalPresets from "./components/SignalPresets";
@@ -24,7 +23,6 @@ function App() {
   const [parameters, setParameters] = useState<SignalParameters>(
     () => sanitizeSignalParameters(DEFAULT_SIGNAL_PARAMETERS),
   );
-  const [oscilloscopeMode, setOscilloscopeMode] = useState(false);
 
   const signalData = useMemo(() => generateSignal(parameters), [parameters]);
 
@@ -61,16 +59,13 @@ function App() {
             onParametersChange={updateParameters}
           />
           <SignalPresets onPresetSelect={updateParameters} />
-          <ParameterSummary parameters={parameters} />
           <SignalExplanation signalType={parameters.type} />
         </div>
 
         <WaveformPanel
           data={signalData}
-          oscilloscopeMode={oscilloscopeMode}
           parameters={parameters}
           onExportCsv={exportSignalCsv}
-          onOscilloscopeModeChange={setOscilloscopeMode}
         />
       </section>
 

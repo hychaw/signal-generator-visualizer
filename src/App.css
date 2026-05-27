@@ -224,10 +224,6 @@
   outline: none;
 }
 
-.summary-panel h2 {
-  margin-bottom: 14px;
-}
-
 .explanation-panel h2 {
   margin-bottom: 14px;
 }
@@ -278,45 +274,18 @@
   white-space: normal;
 }
 
-.parameter-list {
-  display: grid;
-  gap: 10px;
-  margin: 0;
-}
-
-.parameter-list div {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  border-bottom: 1px solid #e8edf4;
-  padding-bottom: 10px;
-}
-
-.parameter-list div:last-child {
-  border-bottom: 0;
-  padding-bottom: 0;
-}
-
-.parameter-list dt {
-  color: #5b6472;
-  font-size: 0.9rem;
-}
-
-.parameter-list dd {
-  margin: 0;
-  color: #172033;
-  font-weight: 700;
-  text-align: right;
-}
-
 .waveform-panel {
   display: grid;
-  grid-template-rows: auto minmax(390px, 1fr);
+  grid-template-rows: auto minmax(390px, 1fr) auto;
   gap: 18px;
   min-height: 610px;
   min-width: 0;
   padding: 22px;
-  border-color: #cbd5e1;
+  border-color: #2f6f55;
+  background: #10231c;
+  box-shadow:
+    0 18px 45px rgba(15, 23, 42, 0.16),
+    0 0 0 1px rgba(134, 239, 172, 0.08) inset;
 }
 
 .waveform-details {
@@ -329,7 +298,12 @@
 
 .waveform-details h2 {
   margin-bottom: 6px;
+  color: #ecfdf5;
   font-size: 1.1rem;
+}
+
+.waveform-details p {
+  color: #b7d7c2;
 }
 
 .waveform-actions {
@@ -339,62 +313,6 @@
   gap: 10px;
   align-items: center;
   min-width: 0;
-}
-
-.mode-toggle {
-  display: inline-flex;
-  gap: 9px;
-  align-items: center;
-  min-height: 40px;
-  color: #273449;
-  font-size: 0.88rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.mode-toggle input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.mode-toggle-track {
-  position: relative;
-  width: 46px;
-  height: 26px;
-  flex: 0 0 auto;
-  border: 1px solid #9aa9ba;
-  border-radius: 999px;
-  background: #e8edf4;
-  transition:
-    background-color 160ms ease,
-    border-color 160ms ease,
-    box-shadow 160ms ease;
-}
-
-.mode-toggle-thumb {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: #ffffff;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.22);
-  transition: transform 160ms ease;
-}
-
-.mode-toggle input:checked + .mode-toggle-track {
-  border-color: #0f766e;
-  background: #0f766e;
-}
-
-.mode-toggle input:checked + .mode-toggle-track .mode-toggle-thumb {
-  transform: translateX(20px);
-}
-
-.mode-toggle input:focus-visible + .mode-toggle-track {
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.24);
 }
 
 .export-button {
@@ -428,50 +346,8 @@
   width: 100%;
   min-width: 0;
   min-height: 390px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid #3f8f68;
   border-radius: 8px;
-  background:
-    linear-gradient(rgba(15, 118, 110, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 118, 110, 0.05) 1px, transparent 1px),
-    #ffffff;
-  background-size: 24px 24px;
-  overflow: hidden;
-}
-
-.waveform-chart .recharts-cartesian-grid line {
-  stroke: #dce4ee;
-}
-
-.waveform-chart .recharts-text {
-  fill: #475569;
-  font-size: 0.78rem;
-}
-
-.waveform-chart .recharts-default-tooltip {
-  border: 1px solid #cbd5e1 !important;
-  border-radius: 6px;
-  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12);
-}
-
-.waveform-panel-oscilloscope {
-  border-color: #2f6f55;
-  background: #10231c;
-  box-shadow:
-    0 18px 45px rgba(15, 23, 42, 0.16),
-    0 0 0 1px rgba(134, 239, 172, 0.08) inset;
-}
-
-.waveform-panel-oscilloscope h2,
-.waveform-panel-oscilloscope .mode-toggle {
-  color: #ecfdf5;
-}
-
-.waveform-panel-oscilloscope p {
-  color: #b7d7c2;
-}
-
-.waveform-chart-oscilloscope {
-  border-color: #3f8f68;
   background:
     linear-gradient(rgba(134, 239, 172, 0.12) 1px, transparent 1px),
     linear-gradient(90deg, rgba(134, 239, 172, 0.12) 1px, transparent 1px),
@@ -482,18 +358,21 @@
     32px 32px,
     100% 100%,
     auto;
+  overflow: hidden;
 }
 
-.waveform-chart-oscilloscope .recharts-cartesian-grid line {
+.waveform-chart .recharts-cartesian-grid line {
   stroke: #2f6f55;
 }
 
-.waveform-chart-oscilloscope .recharts-text {
+.waveform-chart .recharts-text {
   fill: #c8facc;
+  font-size: 0.78rem;
 }
 
-.waveform-chart-oscilloscope .recharts-default-tooltip {
+.waveform-chart .recharts-default-tooltip {
   border-color: #3f8f68 !important;
+  border-radius: 6px;
   background: #0c1f18 !important;
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
 }
@@ -594,16 +473,12 @@
     justify-content: stretch;
   }
 
-  .mode-toggle {
-    width: 100%;
-  }
-
   .export-button {
     width: 100%;
   }
 
   .waveform-panel {
-    grid-template-rows: auto minmax(320px, 1fr);
+    grid-template-rows: auto minmax(320px, 1fr) auto;
     min-height: 480px;
   }
 
