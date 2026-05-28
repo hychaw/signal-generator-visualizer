@@ -1,4 +1,6 @@
 import {
+  Bar,
+  BarChart,
   CartesianGrid,
   Line,
   LineChart,
@@ -9,6 +11,11 @@ import {
   YAxis,
 } from "recharts";
 
+import {
+  DEFAULT_HARMONIC_COUNT,
+  generateIdealSpectrum,
+  type IdealSpectrumPoint,
+} from "../lib/idealSpectrum";
 import type { SignalParameters, SignalPoint } from "../lib/signalTypes";
 
 interface WaveformPanelProps {
@@ -47,6 +54,8 @@ const formatChartValue = (value: unknown) => {
 };
 
 const formatSeconds = (value: number) => `${value.toFixed(4)} s`;
+const formatHertz = (value: number) =>
+  `${value.toLocaleString(undefined, { maximumFractionDigits: 2 })} Hz`;
 
 const formatAmplitude = (value: number) => {
   if (Math.abs(value) < 0.0005) {
@@ -208,6 +217,15 @@ const getOscilloscopeYAxisScale = (data: SignalPoint[]): YAxisScale => {
   };
 };
 
+const getSpectrumYAxisDomain = (spectrumData: IdealSpectrumPoint[]) => {
+  const maxMagnitude = spectrumData.reduce(
+    (currentMax, point) => Math.max(currentMax, point.magnitude),
+    0,
+  );
+
+  return [0, maxMagnitude > 0 ? maxMagnitude * 1.12 : 1] as [number, number];
+};
+
 function WaveformPanel({
   activePresetName,
   data,
@@ -223,6 +241,22 @@ function WaveformPanel({
   const setupLabel = activePresetName ?? "Custom Signal";
   const showMinMaxMarkers = yAxisScale.max !== yAxisScale.min;
   const hasDutyCycle = parameters.type === "square" || parameters.type === "pulse";
+  const spectrumData = generateIdealSpectrum({
+    type: parameters.type,
+    frequency: parameters.frequency,
+    amplitude: parameters.amplitude,
+    offset: parameters.offset,
+    dutyCycle: parameters.dutyCycle,
+    harmonicCount: DEFAULT_HARMONIC_COUNT,
+  });
+  const displayedHarmonics = spectrumData.filter(
+    (point) => point.frequency > 0,
+  ).length;
+  const spectrumYAxisDomain = getSpectrumYAxisDomain(spectrumData);
+  const maxSpectrumFrequency = Math.max(
+    parameters.frequency,
+    ...spectrumData.map((point) => point.frequency),
+  );
 
   return (
     <section
@@ -265,122 +299,230 @@ function WaveformPanel({
         </span>
       </div>
 
-      <div
-        className="waveform-chart"
-        role="img"
-        aria-label="Generated signal waveform chart"
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={data}
-            margin={{ top: 16, right: 24, bottom: 28, left: 16 }}
-          >
-            <CartesianGrid
-              stroke={chartTheme.grid}
-              strokeDasharray="2 6"
-            />
-            <XAxis
-              dataKey="t"
-              label={{
-                value: "Time (s)",
-                position: "insideBottom",
-                offset: -18,
-                fill: chartTheme.axis,
-              }}
-              stroke={chartTheme.axis}
-              tick={{ fill: chartTheme.axis }}
-              tickFormatter={(value: number) => value.toFixed(2)}
-              tickMargin={8}
-              type="number"
-            />
-            <YAxis
-              dataKey="y"
-              domain={yAxisScale.domain}
-              label={{
-                value: "Amplitude",
-                angle: -90,
-                position: "insideLeft",
-                offset: 0,
-                fill: chartTheme.axis,
-              }}
-              stroke={chartTheme.axis}
-              ticks={yAxisScale.ticks}
-              tick={{ fill: chartTheme.axis }}
-              tickFormatter={(value: number) => formatAmplitude(value)}
-              tickMargin={8}
-              type="number"
-            />
-            <ReferenceLine
-              ifOverflow="extendDomain"
-              stroke={chartTheme.reference}
-              strokeDasharray="8 6"
-              strokeWidth={1.5}
-              y={0}
-            />
-            {showMinMaxMarkers ? (
-              <>
-                <ReferenceLine
-                  ifOverflow="extendDomain"
-                  label={{
-                    value: `max ${formatAmplitude(yAxisScale.max)}`,
-                    fill: chartTheme.axis,
-                    fontSize: 12,
-                    position: "insideTopRight",
-                  }}
-                  stroke={chartTheme.reference}
-                  strokeDasharray="4 6"
-                  strokeOpacity={0.72}
-                  y={yAxisScale.max}
-                />
-                <ReferenceLine
-                  ifOverflow="extendDomain"
-                  label={{
-                    value: `min ${formatAmplitude(yAxisScale.min)}`,
-                    fill: chartTheme.axis,
-                    fontSize: 12,
-                    position: "insideBottomRight",
-                  }}
-                  stroke={chartTheme.reference}
-                  strokeDasharray="4 6"
-                  strokeOpacity={0.72}
-                  y={yAxisScale.min}
-                />
-              </>
-            ) : null}
-            <Tooltip
-              contentStyle={{
-                backgroundColor: chartTheme.tooltipBackground,
-                borderColor: chartTheme.tooltipBorder,
-                color: chartTheme.tooltipText,
-              }}
-              formatter={(value) => [
-                typeof value === "number"
-                  ? formatAmplitude(value)
-                  : formatChartValue(value),
-                "Amplitude",
-              ]}
-              itemStyle={{ color: chartTheme.tooltipText }}
-              labelFormatter={(value) =>
-                `Time: ${
+      <section className="chart-section" aria-labelledby="time-domain-title">
+        <div className="chart-heading">
+          <h3 id="time-domain-title">Time Domain</h3>
+        </div>
+        <div
+          className="waveform-chart"
+          role="img"
+          aria-label="Generated signal waveform chart"
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={data}
+              margin={{ top: 16, right: 24, bottom: 28, left: 16 }}
+            >
+              <CartesianGrid
+                stroke={chartTheme.grid}
+                strokeDasharray="2 6"
+              />
+              <XAxis
+                dataKey="t"
+                label={{
+                  value: "Time (s)",
+                  position: "insideBottom",
+                  offset: -18,
+                  fill: chartTheme.axis,
+                }}
+                stroke={chartTheme.axis}
+                tick={{ fill: chartTheme.axis }}
+                tickFormatter={(value: number) => value.toFixed(2)}
+                tickMargin={8}
+                type="number"
+              />
+              <YAxis
+                dataKey="y"
+                domain={yAxisScale.domain}
+                label={{
+                  value: "Amplitude",
+                  angle: -90,
+                  position: "insideLeft",
+                  offset: 0,
+                  fill: chartTheme.axis,
+                }}
+                stroke={chartTheme.axis}
+                ticks={yAxisScale.ticks}
+                tick={{ fill: chartTheme.axis }}
+                tickFormatter={(value: number) => formatAmplitude(value)}
+                tickMargin={8}
+                type="number"
+              />
+              <ReferenceLine
+                ifOverflow="extendDomain"
+                stroke={chartTheme.reference}
+                strokeDasharray="8 6"
+                strokeWidth={1.5}
+                y={0}
+              />
+              {showMinMaxMarkers ? (
+                <>
+                  <ReferenceLine
+                    ifOverflow="extendDomain"
+                    label={{
+                      value: `max ${formatAmplitude(yAxisScale.max)}`,
+                      fill: chartTheme.axis,
+                      fontSize: 12,
+                      position: "insideTopRight",
+                    }}
+                    stroke={chartTheme.reference}
+                    strokeDasharray="4 6"
+                    strokeOpacity={0.72}
+                    y={yAxisScale.max}
+                  />
+                  <ReferenceLine
+                    ifOverflow="extendDomain"
+                    label={{
+                      value: `min ${formatAmplitude(yAxisScale.min)}`,
+                      fill: chartTheme.axis,
+                      fontSize: 12,
+                      position: "insideBottomRight",
+                    }}
+                    stroke={chartTheme.reference}
+                    strokeDasharray="4 6"
+                    strokeOpacity={0.72}
+                    y={yAxisScale.min}
+                  />
+                </>
+              ) : null}
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: chartTheme.tooltipBackground,
+                  borderColor: chartTheme.tooltipBorder,
+                  color: chartTheme.tooltipText,
+                }}
+                formatter={(value) => [
                   typeof value === "number"
-                    ? formatSeconds(value)
-                    : `${formatChartValue(value)} s`
-                }`
-              }
-              labelStyle={{ color: chartTheme.tooltipText }}
-            />
-            <Line
-              dataKey="y"
-              dot={false}
-              isAnimationActive={false}
-              name="Amplitude"
-              stroke={chartTheme.line}
-              strokeWidth={2}
-              type="linear"
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+                    ? formatAmplitude(value)
+                    : formatChartValue(value),
+                  "Amplitude",
+                ]}
+                itemStyle={{ color: chartTheme.tooltipText }}
+                labelFormatter={(value) =>
+                  `Time: ${
+                    typeof value === "number"
+                      ? formatSeconds(value)
+                      : `${formatChartValue(value)} s`
+                  }`
+                }
+                labelStyle={{ color: chartTheme.tooltipText }}
+              />
+              <Line
+                dataKey="y"
+                dot={false}
+                isAnimationActive={false}
+                name="Amplitude"
+                stroke={chartTheme.line}
+                strokeWidth={2}
+                type="linear"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </section>
+
+      <section
+        className="chart-section frequency-domain-section"
+        aria-labelledby="frequency-domain-title"
+      >
+        <div className="chart-heading frequency-domain-heading">
+          <h3 id="frequency-domain-title">Frequency Domain</h3>
+          <div className="frequency-readouts" aria-label="Spectrum readouts">
+            <span>
+              <strong>Fundamental</strong>
+              {formatHertz(parameters.frequency)}
+            </span>
+            <span>
+              <strong>Displayed harmonics</strong>
+              {displayedHarmonics}
+            </span>
+            <span>
+              <strong>Spectrum type</strong>
+              Ideal harmonic model
+            </span>
+          </div>
+        </div>
+        <div
+          className="waveform-chart frequency-chart"
+          role="img"
+          aria-label="Ideal harmonic frequency spectrum chart"
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={spectrumData}
+              margin={{ top: 16, right: 24, bottom: 28, left: 16 }}
+            >
+              <CartesianGrid stroke={chartTheme.grid} strokeDasharray="2 6" />
+              <XAxis
+                dataKey="frequency"
+                domain={[0, maxSpectrumFrequency]}
+                label={{
+                  value: "Frequency (Hz)",
+                  position: "insideBottom",
+                  offset: -18,
+                  fill: chartTheme.axis,
+                }}
+                stroke={chartTheme.axis}
+                tick={{ fill: chartTheme.axis }}
+                tickFormatter={(value: number) => formatHertz(value)}
+                tickMargin={8}
+                type="number"
+              />
+              <YAxis
+                dataKey="magnitude"
+                domain={spectrumYAxisDomain}
+                label={{
+                  value: "Magnitude",
+                  angle: -90,
+                  position: "insideLeft",
+                  offset: 0,
+                  fill: chartTheme.axis,
+                }}
+                stroke={chartTheme.axis}
+                tick={{ fill: chartTheme.axis }}
+                tickFormatter={(value: number) => formatAmplitude(value)}
+                tickMargin={8}
+                type="number"
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: chartTheme.tooltipBackground,
+                  borderColor: chartTheme.tooltipBorder,
+                  color: chartTheme.tooltipText,
+                }}
+                formatter={(value) => [
+                  typeof value === "number"
+                    ? formatAmplitude(value)
+                    : formatChartValue(value),
+                  "Magnitude",
+                ]}
+                itemStyle={{ color: chartTheme.tooltipText }}
+                labelFormatter={(value) =>
+                  `Frequency: ${
+                    typeof value === "number"
+                      ? formatHertz(value)
+                      : formatChartValue(value)
+                  }`
+                }
+                labelStyle={{ color: chartTheme.tooltipText }}
+              />
+              <Bar
+                barSize={18}
+                dataKey="magnitude"
+                fill={chartTheme.line}
+                isAnimationActive={false}
+                name="Magnitude"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <p className="spectrum-note">
+          This view shows an ideal harmonic model for the selected waveform. It
+          is designed for learning and does not include FFT effects such as
+          spectral leakage, sampling rate, or windowing.
+        </p>
+      </section>
 
       <section
         className={`scope-readout${hasDutyCycle ? " has-duty-cycle" : ""}`}
