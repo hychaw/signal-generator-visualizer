@@ -67,8 +67,9 @@ function App() {
         <p className="eyebrow">Engineering signal exploration</p>
         <h1>Signal Generator Visualizer</h1>
         <p className="description">
-          Explore, adjust, and export common engineering waveforms in an
-          oscilloscope-style interface.
+          Explore engineering waveforms with time-domain plotting, an
+          educational ideal harmonic frequency-domain view, measurements,
+          presets, and CSV export.
         </p>
       </header>
 
