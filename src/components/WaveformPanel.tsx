@@ -9,18 +9,22 @@ import {
   YAxis,
 } from "recharts";
 
+import DisplaySettings, {
+  type DisplaySettingsState,
+} from "./DisplaySettings";
+import FrequencySpectrumPanel from "./FrequencySpectrumPanel";
+import MeasurementsPanel from "./MeasurementsPanel";
+import { calculateFrequencySpectrum } from "../lib/frequencyAnalysis";
+import { calculateSignalMeasurements } from "../lib/measurements";
 import type { SignalParameters, SignalPoint } from "../lib/signalTypes";
 
 interface WaveformPanelProps {
   activePresetName: string | null;
   data: SignalPoint[];
+  displaySettings: DisplaySettingsState;
   parameters: SignalParameters;
+  onDisplaySettingsChange: (settings: DisplaySettingsState) => void;
   onExportCsv: () => void;
-}
-
-interface Measurement {
-  label: string;
-  value: string;
 }
 
 interface YAxisScale {
@@ -48,6 +52,9 @@ const formatChartValue = (value: unknown) => {
 
 const formatSeconds = (value: number) => `${value.toFixed(4)} s`;
 
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max);
+
 const formatAmplitude = (value: number) => {
   if (Math.abs(value) < 0.0005) {
     return "0";
@@ -73,17 +80,6 @@ const chartTheme = {
   tooltipText: "#e0f7ff",
 };
 
-const formatMeasurement = (value: number, unit = "") => {
-  const formattedValue =
-    Math.abs(value) >= 100
-      ? value.toFixed(1)
-      : Math.abs(value) >= 10
-        ? value.toFixed(2)
-        : value.toFixed(3);
-
-  return `${formattedValue}${unit}`;
-};
-
 const formatScale = (value: number, unit: string) => {
   const formattedValue =
     Math.abs(value) >= 10
@@ -107,53 +103,6 @@ const getDataRange = (data: SignalPoint[]) => {
     }),
     { max: data[0].y, min: data[0].y },
   );
-};
-
-const getMeasurements = (
-  parameters: SignalParameters,
-  data: SignalPoint[],
-): Measurement[] => {
-  const { max, min } = getDataRange(data);
-  const period = parameters.frequency > 0 ? 1 / parameters.frequency : 0;
-  const dcOffset =
-    data.length > 0
-      ? data.reduce((total, point) => total + point.y, 0) / data.length
-      : parameters.offset;
-  const measurements: Measurement[] = [
-    {
-      label: "Frequency",
-      value: formatMeasurement(parameters.frequency, " Hz"),
-    },
-    {
-      label: "Period",
-      value: formatMeasurement(period, " s"),
-    },
-    {
-      label: "Max",
-      value: formatMeasurement(max),
-    },
-    {
-      label: "Min",
-      value: formatMeasurement(min),
-    },
-    {
-      label: "Vpp",
-      value: formatMeasurement(max - min),
-    },
-    {
-      label: "Offset",
-      value: formatMeasurement(dcOffset),
-    },
-  ];
-
-  if (parameters.type === "square" || parameters.type === "pulse") {
-    measurements.push({
-      label: "Duty",
-      value: formatMeasurement(parameters.dutyCycle, "%"),
-    });
-  }
-
-  return measurements;
 };
 
 const getNiceStep = (span: number, targetTickCount: number) => {
@@ -208,21 +157,46 @@ const getOscilloscopeYAxisScale = (data: SignalPoint[]): YAxisScale => {
   };
 };
 
+const getVisibleDuration = (parameters: SignalParameters) =>
+  clamp(5 / parameters.frequency, 0.005, Math.min(parameters.duration, 1));
+
+const getVisibleSignalData = (
+  data: SignalPoint[],
+  visibleDuration: number,
+): SignalPoint[] => {
+  if (data.length === 0) {
+    return data;
+  }
+
+  const startTime = data[0].t;
+  const endTime = startTime + visibleDuration;
+  const visibleData = data.filter(
+    (point) => point.t >= startTime && point.t <= endTime,
+  );
+
+  return visibleData.length >= 2 ? visibleData : data.slice(0, 2);
+};
+
 function WaveformPanel({
   activePresetName,
   data,
+  displaySettings,
   parameters,
+  onDisplaySettingsChange,
   onExportCsv,
 }: WaveformPanelProps) {
-  const measurements = getMeasurements(parameters, data);
-  const yAxisScale = getOscilloscopeYAxisScale(data);
+  const measurements = calculateSignalMeasurements(parameters, data);
+  const frequencyData = calculateFrequencySpectrum(data, parameters.sampleRate);
+  const visibleDuration = getVisibleDuration(parameters);
+  const visibleData = getVisibleSignalData(data, visibleDuration);
+  const yAxisScale = getOscilloscopeYAxisScale(visibleData);
   const signalLabel =
     parameters.type.charAt(0).toUpperCase() + parameters.type.slice(1);
-  const timePerDivision = parameters.duration / 10;
+  const timePerDivision = visibleDuration / 10;
   const amplitudePerDivision = (yAxisScale.domain[1] - yAxisScale.domain[0]) / 8;
   const setupLabel = activePresetName ?? "Custom Signal";
   const showMinMaxMarkers = yAxisScale.max !== yAxisScale.min;
-  const hasDutyCycle = parameters.type === "square" || parameters.type === "pulse";
+  const nyquistFrequency = parameters.sampleRate / 2;
 
   return (
     <section
@@ -248,8 +222,8 @@ function WaveformPanel({
 
       <div className="scope-meta" aria-label="Oscilloscope setup">
         <span>
-          <strong>Time window</strong>
-          {formatScale(parameters.duration, "s")}
+          <strong>Visible window</strong>
+          {formatScale(visibleDuration, "s")}
         </span>
         <span>
           <strong>Sample rate</strong>
@@ -265,14 +239,21 @@ function WaveformPanel({
         </span>
       </div>
 
+      <DisplaySettings
+        settings={displaySettings}
+        onSettingsChange={onDisplaySettingsChange}
+      />
+
       <div
-        className="waveform-chart"
+        className={`scope-chart waveform-chart${
+          displaySettings.showGrid ? "" : " hide-grid"
+        }`}
         role="img"
         aria-label="Generated signal waveform chart"
       >
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
-            data={data}
+            data={visibleData}
             margin={{ top: 16, right: 24, bottom: 28, left: 16 }}
           >
             <CartesianGrid
@@ -281,6 +262,10 @@ function WaveformPanel({
             />
             <XAxis
               dataKey="t"
+              domain={[
+                visibleData[0]?.t ?? 0,
+                visibleData[visibleData.length - 1]?.t ?? visibleDuration,
+              ]}
               label={{
                 value: "Time (s)",
                 position: "insideBottom",
@@ -289,7 +274,9 @@ function WaveformPanel({
               }}
               stroke={chartTheme.axis}
               tick={{ fill: chartTheme.axis }}
-              tickFormatter={(value: number) => value.toFixed(2)}
+              tickFormatter={(value: number) =>
+                visibleDuration < 0.1 ? value.toFixed(3) : value.toFixed(2)
+              }
               tickMargin={8}
               type="number"
             />
@@ -382,17 +369,17 @@ function WaveformPanel({
         </ResponsiveContainer>
       </div>
 
-      <section
-        className={`scope-readout${hasDutyCycle ? " has-duty-cycle" : ""}`}
-        aria-label="Signal measurements"
-      >
-        {measurements.map((measurement) => (
-          <div className="scope-measurement" key={measurement.label}>
-            <span>{measurement.label}</span>
-            <strong>{measurement.value}</strong>
-          </div>
-        ))}
-      </section>
+      {displaySettings.showFrequencySpectrum ? (
+        <FrequencySpectrumPanel
+          data={frequencyData}
+          nyquistFrequency={nyquistFrequency}
+          showGrid={displaySettings.showGrid}
+        />
+      ) : null}
+
+      {displaySettings.showMeasurements ? (
+        <MeasurementsPanel measurements={measurements} />
+      ) : null}
     </section>
   );
 }

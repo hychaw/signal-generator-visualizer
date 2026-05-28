@@ -9,6 +9,8 @@ import {
 const TWO_PI = Math.PI * 2;
 const MAX_EDGE_MARKER_CYCLES = 200;
 const EDGE_EPSILON_SECONDS = 1e-9;
+const INTERNAL_SAMPLE_RATE_CAP = 50_000;
+const MIN_SAMPLES_PER_CYCLE = 100;
 
 export interface SanitizedSignalParameters extends SignalParameters {
   dutyCycle: number;
@@ -94,11 +96,17 @@ export function sanitizeSignalParameters(
     "duration",
     parameters.duration,
   );
+  const internalSampleRate = Math.min(
+    INTERNAL_SAMPLE_RATE_CAP,
+    Math.max(sampleRate, Math.ceil(frequency * MIN_SAMPLES_PER_CYCLE)),
+  );
   const requestedSampleCount = Math.max(
     2,
-    Math.floor(sampleRate * duration) + 1,
+    Math.floor(internalSampleRate * duration) + 1,
   );
   const sampleCount = Math.min(requestedSampleCount, MAX_GENERATED_POINTS);
+  const sampleStep = duration / (sampleCount - 1);
+  const actualSampleRate = 1 / sampleStep;
 
   return {
     ...parameters,
@@ -108,10 +116,10 @@ export function sanitizeSignalParameters(
     phase,
     phaseCycles: normalizePhase(phase),
     dutyCycle,
-    sampleRate,
+    sampleRate: actualSampleRate,
     duration,
     sampleCount,
-    sampleStep: duration / (sampleCount - 1),
+    sampleStep,
   };
 }
 

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import "./App.css";
 
+import type { DisplaySettingsState } from "./components/DisplaySettings";
 import SignalControls from "./components/SignalControls";
 import SignalExplanation from "./components/SignalExplanation";
 import SignalPresets from "./components/SignalPresets";
@@ -24,6 +25,11 @@ function App() {
     () => sanitizeSignalParameters(DEFAULT_SIGNAL_PARAMETERS),
   );
   const [activePresetName, setActivePresetName] = useState<string | null>(null);
+  const [displaySettings, setDisplaySettings] = useState<DisplaySettingsState>({
+    showFrequencySpectrum: true,
+    showGrid: true,
+    showMeasurements: true,
+  });
 
   const signalData = useMemo(() => generateSignal(parameters), [parameters]);
 
@@ -89,8 +95,10 @@ function App() {
         <WaveformPanel
           activePresetName={activePresetName}
           data={signalData}
+          displaySettings={displaySettings}
           parameters={parameters}
           onExportCsv={exportSignalCsv}
+          onDisplaySettingsChange={setDisplaySettings}
         />
       </section>
 

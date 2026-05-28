@@ -21,8 +21,12 @@ The app helps users explore how waveform parameters affect signal shape over tim
 - Sine, square, triangle, sawtooth, and pulse waveforms
 - Adjustable frequency, amplitude, phase, DC offset, and duty cycle where applicable
 - Blue oscilloscope-style waveform display
+- Frequency-domain spectrum view
+- DFT-based signal analysis from generated waveform samples
+- Adaptive visible time window so higher-frequency signals remain readable
 - Real-time waveform updates
-- Measurement readouts for frequency, period, max, min, Vpp, offset, and duty cycle where relevant
+- Measurement readouts for frequency, period, max/min voltage, peak-to-peak voltage, average value, RMS voltage, sample count, and duty cycle where relevant
+- Improved oscilloscope display with grid, zero reference, time/div, volts/div, and compact display toggles
 - Engineering signal presets
 - Reset Parameters button
 - CSV export for generated waveform samples
@@ -42,10 +46,12 @@ The app helps users explore how waveform parameters affect signal shape over tim
 ## How It Works
 
 1. The user selects a signal type and adjusts the available parameters.
-2. TypeScript utility functions generate waveform sample points from the current settings.
-3. Recharts displays the generated waveform in the oscilloscope-style panel.
-4. Measurement cards summarize important signal values such as frequency, period, voltage range, offset, and duty cycle where applicable.
-5. CSV export converts the current waveform data into downloadable sample rows.
+2. Internal time-domain samples are generated from the selected signal parameters for measurements, frequency-domain analysis, and CSV export.
+3. The time-domain plot uses an adaptive visible time window so low frequencies can show up to one second while higher frequencies show only a few readable cycles.
+4. Frequency-domain data is calculated from the generated samples with a TypeScript DFT utility and displayed as a one-sided spectrum up to the Nyquist frequency.
+5. Recharts displays both the waveform and frequency spectrum in the oscilloscope-style panel.
+6. Measurement values are computed from the waveform data, including average value and RMS voltage.
+7. CSV export converts the current waveform data into downloadable sample rows.
 
 ## Project Structure
 
@@ -136,11 +142,11 @@ I also learned more about signal generation math, data visualization with Rechar
 
 ## Future Improvements
 
-- FFT / frequency spectrum view
+- dB scale for frequency-domain analysis
+- Window functions for frequency-domain analysis
 - Audio playback for audible signals
 - Trigger level marker
 - Cursor measurement tools
-- Time/div and volts/div controls
 - Digital sampling and quantization visualization
 - Filter or Bode response tools
 - Unit tests for signal generation functions
