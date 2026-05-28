@@ -1,6 +1,6 @@
 # Signal Generator Visualizer
 
-Signal Generator Visualizer is an interactive React + TypeScript web app for visualizing common engineering waveforms in a blue oscilloscope-style interface. Users can adjust signal parameters, view measurement readouts, apply presets, reset parameters, and export generated waveform samples as CSV data.
+Signal Generator Visualizer is an interactive React + TypeScript web app for visualizing common engineering waveforms in a blue oscilloscope-style interface. Users can adjust signal parameters, view time-domain and educational frequency-domain plots, inspect measurement readouts, apply presets, reset parameters, and export generated waveform samples as CSV data.
 
 ## Live Demo
 
@@ -14,13 +14,16 @@ https://signal-generator-visualizer.vercel.app/
 
 ## Overview
 
-The app helps users explore how waveform parameters affect signal shape over time. It is useful for engineering learning, quick experimentation, and demonstrating frontend portfolio skills through a responsive, data-driven React interface.
+The app helps users explore how waveform parameters affect signal shape over time and how ideal harmonic components appear in the frequency domain. It is useful for engineering learning, quick experimentation, and demonstrating frontend portfolio skills through a responsive, data-driven React interface.
 
 ## Features
 
 - Sine, square, triangle, sawtooth, and pulse waveforms
 - Adjustable frequency, amplitude, phase, DC offset, and duty cycle where applicable
 - Blue oscilloscope-style waveform display
+- Time-domain Full Window and Zoomed views
+- Frequency-domain view using an ideal harmonic model
+- Spectrum visualization for sine, square, triangle, sawtooth, and pulse waveforms
 - Real-time waveform updates
 - Measurement readouts for frequency, period, max, min, Vpp, offset, and duty cycle where relevant
 - Engineering signal presets
@@ -43,9 +46,12 @@ The app helps users explore how waveform parameters affect signal shape over tim
 
 1. The user selects a signal type and adjusts the available parameters.
 2. TypeScript utility functions generate waveform sample points from the current settings.
-3. Recharts displays the generated waveform in the oscilloscope-style panel.
-4. Measurement cards summarize important signal values such as frequency, period, voltage range, offset, and duty cycle where applicable.
-5. CSV export converts the current waveform data into downloadable sample rows.
+3. A separate ideal-spectrum utility calculates theoretical harmonic magnitudes for the selected waveform.
+4. Recharts displays the generated waveform and ideal harmonic spectrum in the oscilloscope-style panel. The time-domain chart can show the full generated window or a zoomed view of approximately five cycles for easier waveform inspection.
+5. Measurement cards summarize important signal values such as frequency, period, voltage range, offset, and duty cycle where applicable.
+6. CSV export converts the full generated time-domain waveform data into downloadable sample rows, regardless of the selected chart view.
+
+The frequency-domain view is an educational harmonic model, not a full FFT analyzer yet. It does not model spectral leakage, sampling rate, windowing, FFT bin spacing, or FFT scaling.
 
 ## Project Structure
 
@@ -136,13 +142,16 @@ I also learned more about signal generation math, data visualization with Rechar
 
 ## Future Improvements
 
-- FFT / frequency spectrum view
+- Real FFT mode
+- dB scale
+- Window functions
+- Sampling and aliasing demo
+- Filter visualization
 - Audio playback for audible signals
 - Trigger level marker
 - Cursor measurement tools
 - Time/div and volts/div controls
 - Digital sampling and quantization visualization
-- Filter or Bode response tools
 - Unit tests for signal generation functions
 
 ## License

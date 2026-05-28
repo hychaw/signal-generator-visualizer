@@ -7,6 +7,9 @@ import {
 } from "./signalTypes";
 
 const TWO_PI = Math.PI * 2;
+const ADAPTIVE_SAMPLES_PER_CYCLE = 100;
+const MIN_GENERATED_SAMPLE_RATE = 1000;
+const MAX_GENERATED_SAMPLE_RATE = 50_000;
 const MAX_EDGE_MARKER_CYCLES = 200;
 const EDGE_EPSILON_SECONDS = 1e-9;
 
@@ -43,6 +46,18 @@ export function normalizePhase(phaseDegrees: number): number {
   }
 
   return (((phaseDegrees / 360) % 1) + 1) % 1;
+}
+
+function getAdaptiveSampleRate(frequency: number) {
+  const frequencyBasedSampleRate = frequency * ADAPTIVE_SAMPLES_PER_CYCLE;
+
+  return Math.round(
+    clamp(
+      Math.max(MIN_GENERATED_SAMPLE_RATE, frequencyBasedSampleRate),
+      MIN_GENERATED_SAMPLE_RATE,
+      MAX_GENERATED_SAMPLE_RATE,
+    ),
+  );
 }
 
 export function sanitizeNumericSignalParameter(
@@ -86,17 +101,14 @@ export function sanitizeSignalParameters(
     "dutyCycle",
     parameters.dutyCycle,
   );
-  const sampleRate = sanitizeNumericSignalParameter(
-    "sampleRate",
-    parameters.sampleRate,
-  );
+  const generatedSampleRate = getAdaptiveSampleRate(frequency);
   const duration = sanitizeNumericSignalParameter(
     "duration",
     parameters.duration,
   );
   const requestedSampleCount = Math.max(
     2,
-    Math.floor(sampleRate * duration) + 1,
+    Math.floor(generatedSampleRate * duration) + 1,
   );
   const sampleCount = Math.min(requestedSampleCount, MAX_GENERATED_POINTS);
 
@@ -108,7 +120,7 @@ export function sanitizeSignalParameters(
     phase,
     phaseCycles: normalizePhase(phase),
     dutyCycle,
-    sampleRate,
+    sampleRate: generatedSampleRate,
     duration,
     sampleCount,
     sampleStep: duration / (sampleCount - 1),

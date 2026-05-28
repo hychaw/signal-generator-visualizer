@@ -30,7 +30,7 @@ export const SIGNAL_PARAMETER_RANGES: Record<
 > = {
   frequency: {
     min: 1,
-    max: 100,
+    max: 1000,
     step: 1,
   },
   amplitude: {
@@ -65,7 +65,7 @@ export const SIGNAL_PARAMETER_RANGES: Record<
   },
 };
 
-export const MAX_GENERATED_POINTS = 2_500;
+export const MAX_GENERATED_POINTS = 50_000;
 
 export const DEFAULT_SIGNAL_PARAMETERS: SignalParameters = {
   type: "sine",
