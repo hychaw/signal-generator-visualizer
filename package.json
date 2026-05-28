@@ -2,6 +2,7 @@
   "name": "signal-generator-visualizer",
   "private": true,
   "version": "0.0.0",
+  "description": "Interactive signal generator and waveform visualizer with time-domain plotting, ideal harmonic frequency-domain visualization, measurements, presets, and CSV export.",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -525,7 +525,7 @@ function WaveformPanel({
         aria-labelledby="frequency-domain-title"
       >
         <div className="chart-heading frequency-domain-heading">
-          <h3 id="frequency-domain-title">Frequency Domain</h3>
+          <h3 id="frequency-domain-title">Educational Frequency Domain</h3>
           <div className="frequency-readouts" aria-label="Spectrum readouts">
             <span>
               <strong>Fundamental</strong>
@@ -617,9 +617,9 @@ function WaveformPanel({
           </ResponsiveContainer>
         </div>
         <p className="spectrum-note">
-          This view shows an ideal harmonic model for the selected waveform. It
-          is designed for learning and does not include FFT effects such as
-          spectral leakage, sampling rate, or windowing.
+          This ideal harmonic model shows theoretical components for learning
+          and does not include FFT effects such as spectral leakage, sampling
+          rate, or windowing.
         </p>
       </section>
 
