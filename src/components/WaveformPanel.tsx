@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -36,6 +37,17 @@ interface YAxisScale {
   min: number;
   ticks: number[];
 }
+
+type TimeDomainView = "full" | "zoomed";
+
+const MAX_TIME_DOMAIN_PLOT_POINTS = 1500;
+const TIME_DOMAIN_VIEW_OPTIONS: Array<{
+  label: string;
+  value: TimeDomainView;
+}> = [
+  { label: "Full Window", value: "full" },
+  { label: "Zoomed", value: "zoomed" },
+];
 
 const formatChartValue = (value: unknown) => {
   if (typeof value === "number") {
@@ -102,6 +114,54 @@ const formatScale = (value: number, unit: string) => {
         : value.toFixed(4);
 
   return `${formattedValue.replace(/\.?0+$/, "")} ${unit}`;
+};
+
+const formatTimeScale = (seconds: number, suffix = "") => {
+  if (Math.abs(seconds) < 1) {
+    return `${formatScale(seconds * 1000, `ms${suffix}`)}`;
+  }
+
+  return formatScale(seconds, `s${suffix}`);
+};
+
+const getVisibleDuration = (
+  view: TimeDomainView,
+  frequency: number,
+  fullTimeWindow: number,
+) => {
+  if (view === "full" || frequency <= 0) {
+    return fullTimeWindow;
+  }
+
+  return Math.min(Math.max(5 / frequency, 0.005), fullTimeWindow);
+};
+
+const downsampleEvenly = (
+  data: SignalPoint[],
+  maxPointCount: number,
+): SignalPoint[] => {
+  if (data.length <= maxPointCount) {
+    return data;
+  }
+
+  const step = (data.length - 1) / (maxPointCount - 1);
+
+  return Array.from({ length: maxPointCount }, (_, index) => {
+    const sourceIndex = Math.round(index * step);
+
+    return data[sourceIndex];
+  });
+};
+
+const getDisplayedTimeData = (
+  data: SignalPoint[],
+  visibleDuration: number,
+) => {
+  const visibleData = data.filter(
+    (point) => point.t >= 0 && point.t <= visibleDuration,
+  );
+
+  return downsampleEvenly(visibleData, MAX_TIME_DOMAIN_PLOT_POINTS);
 };
 
 const getDataRange = (data: SignalPoint[]) => {
@@ -232,11 +292,22 @@ function WaveformPanel({
   parameters,
   onExportCsv,
 }: WaveformPanelProps) {
+  const [timeDomainView, setTimeDomainView] =
+    useState<TimeDomainView>("zoomed");
   const measurements = getMeasurements(parameters, data);
   const yAxisScale = getOscilloscopeYAxisScale(data);
   const signalLabel =
     parameters.type.charAt(0).toUpperCase() + parameters.type.slice(1);
-  const timePerDivision = parameters.duration / 10;
+  const visibleDuration = getVisibleDuration(
+    timeDomainView,
+    parameters.frequency,
+    parameters.duration,
+  );
+  const displayedTimeData = useMemo(
+    () => getDisplayedTimeData(data, visibleDuration),
+    [data, visibleDuration],
+  );
+  const timePerDivision = visibleDuration / 10;
   const amplitudePerDivision = (yAxisScale.domain[1] - yAxisScale.domain[0]) / 8;
   const setupLabel = activePresetName ?? "Custom Signal";
   const showMinMaxMarkers = yAxisScale.max !== yAxisScale.min;
@@ -283,7 +354,7 @@ function WaveformPanel({
       <div className="scope-meta" aria-label="Oscilloscope setup">
         <span>
           <strong>Time window</strong>
-          {formatScale(parameters.duration, "s")}
+          {formatTimeScale(visibleDuration)}
         </span>
         <span>
           <strong>Sample rate</strong>
@@ -291,7 +362,7 @@ function WaveformPanel({
         </span>
         <span>
           <strong>Horizontal</strong>
-          {formatScale(timePerDivision, "s/div")}
+          {formatTimeScale(timePerDivision, "/div")}
         </span>
         <span>
           <strong>Vertical</strong>
@@ -302,6 +373,29 @@ function WaveformPanel({
       <section className="chart-section" aria-labelledby="time-domain-title">
         <div className="chart-heading">
           <h3 id="time-domain-title">Time Domain</h3>
+          <div className="time-domain-toolbar">
+            <div
+              className="segmented-control"
+              aria-label="Time domain view"
+              role="group"
+            >
+              {TIME_DOMAIN_VIEW_OPTIONS.map((option) => (
+                <button
+                  className={
+                    timeDomainView === option.value ? "is-active" : undefined
+                  }
+                  key={option.value}
+                  type="button"
+                  onClick={() => setTimeDomainView(option.value)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <span className="plot-count">
+              {displayedTimeData.length.toLocaleString()} plotted points
+            </span>
+          </div>
         </div>
         <div
           className="waveform-chart"
@@ -310,7 +404,7 @@ function WaveformPanel({
         >
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
-              data={data}
+              data={displayedTimeData}
               margin={{ top: 16, right: 24, bottom: 28, left: 16 }}
             >
               <CartesianGrid
@@ -319,15 +413,20 @@ function WaveformPanel({
               />
               <XAxis
                 dataKey="t"
+                domain={[0, visibleDuration]}
                 label={{
-                  value: "Time (s)",
+                  value: visibleDuration < 1 ? "Time (ms)" : "Time (s)",
                   position: "insideBottom",
                   offset: -18,
                   fill: chartTheme.axis,
                 }}
                 stroke={chartTheme.axis}
                 tick={{ fill: chartTheme.axis }}
-                tickFormatter={(value: number) => value.toFixed(2)}
+                tickFormatter={(value: number) =>
+                  visibleDuration < 1
+                    ? `${Number((value * 1000).toFixed(1))}`
+                    : value.toFixed(2)
+                }
                 tickMargin={8}
                 type="number"
               />

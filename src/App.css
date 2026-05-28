@@ -381,6 +381,64 @@
   text-transform: uppercase;
 }
 
+.time-domain-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.segmented-control {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(92px, 1fr));
+  min-width: 0;
+  border: 1px solid rgba(125, 211, 252, 0.24);
+  border-radius: 6px;
+  background: rgba(3, 31, 51, 0.72);
+  padding: 3px;
+}
+
+.segmented-control button {
+  min-height: 30px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #bdeeff;
+  padding: 5px 9px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.segmented-control button:hover {
+  background: rgba(14, 165, 233, 0.16);
+}
+
+.segmented-control button.is-active {
+  background: #0e7490;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.24);
+}
+
+.segmented-control button:focus-visible {
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.28);
+  outline: none;
+}
+
+.plot-count {
+  color: #a7d7e8;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .frequency-domain-heading {
   align-items: start;
 }
@@ -713,6 +771,14 @@
   .chart-heading,
   .frequency-domain-heading {
     display: grid;
+  }
+
+  .time-domain-toolbar {
+    justify-content: stretch;
+  }
+
+  .segmented-control {
+    width: 100%;
   }
 
   .frequency-readouts {
